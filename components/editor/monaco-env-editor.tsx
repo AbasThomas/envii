@@ -1,0 +1,41 @@
+"use client";
+
+import Editor from "@monaco-editor/react";
+import { useMemo } from "react";
+
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+  height?: string;
+};
+
+export function MonacoEnvEditor({ value, onChange, height = "420px" }: Props) {
+  const options = useMemo(
+    () => ({
+      minimap: { enabled: false },
+      fontSize: 14,
+      smoothScrolling: true,
+      cursorBlinking: "smooth",
+      automaticLayout: true,
+      wordWrap: "on",
+      lineNumbers: "on",
+      bracketPairColorization: { enabled: true },
+      renderLineHighlight: "gutter",
+      padding: { top: 12, bottom: 12 },
+    }),
+    [],
+  );
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-zinc-800">
+      <Editor
+        language="shell"
+        theme="vs-dark"
+        value={value}
+        options={options}
+        height={height}
+        onChange={(nextValue) => onChange(nextValue ?? "")}
+      />
+    </div>
+  );
+}
