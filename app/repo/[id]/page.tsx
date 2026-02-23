@@ -1,0 +1,254 @@
+"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { diffString } from "json-diff";
+import { GitForkIcon, SaveIcon, SparklesIcon, StarIcon } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
+
+import { MonacoEnvEditor } from "@/components/editor/monaco-env-editor";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { EnvGraph } from "@/components/visualizer/env-graph";
+import { useShortcuts } from "@/hooks/use-shortcuts";
+import { parseDotEnv, stringifyDotEnv } from "@/lib/env";
+import { fetcher } from "@/lib/fetcher";
+
+type RepoDetailsResponse = {
+  repo: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    isPublic: boolean;
+    tags: string[];
+    _count: { stars: number; envs: number; shares: number };
+    envs: Array<{
+      id: string;
+      version: number;
+      environment: string;
+      commitMsg: string;
+      diffSummary: string | null;
+      createdAt: string;
+      user: { id: string; name: string | null; email: string };
+    }>;
+  };
+};
+
+type LatestEnvResponse = {
+  env: {
+    id: string;
+    environment: string;
+    version: number;
+    decrypted?: Record<string, string>;
+  };
+};
+
+export default function RepoPage() {
+  const params = useParams<{ id: string }>();
+  const repoId = params.id;
+  const queryClient = useQueryClient();
+
+  const [envSource, setEnvSource] = useState("NODE_ENV=development\n");
+  const [commitMsg, setCommitMsg] = useState("Update env values");
+  const [environment, setEnvironment] = useState<"development" | "staging" | "production">(
+    "development",
+  );
+  const [localDiff, setLocalDiff] = useState("");
+
+  const repoQuery = useQuery({
+    queryKey: ["repo", repoId],
+    queryFn: () => fetcher<RepoDetailsResponse>(`/api/repos/${repoId}`),
+  });
+
+  const latestQuery = useQuery({
+    queryKey: ["repo-latest", repoId, environment],
+    queryFn: () =>
+      fetcher<LatestEnvResponse>(`/api/envs/${repoId}/latest?environment=${environment}&decrypt=true`),
+    enabled: !!repoId,
+  });
+
+  const latestDecryptedSource = latestQuery.data?.env?.decrypted
+    ? stringifyDotEnv(latestQuery.data.env.decrypted)
+    : null;
+
+  useEffect(() => {
+    if (latestDecryptedSource) {
+      queueMicrotask(() => setEnvSource(latestDecryptedSource));
+    }
+  }, [latestDecryptedSource]);
+
+  const commitMutation = useMutation({
+    mutationFn: () =>
+      fetcher("/api/envs", {
+        method: "POST",
+        body: JSON.stringify({
+          repoId,
+          environment,
+          commitMsg,
+          env: parseDotEnv(envSource),
+        }),
+      }),
+    onSuccess: () => {
+      toast.success("Snapshot committed");
+      queryClient.invalidateQueries({ queryKey: ["repo", repoId] });
+      queryClient.invalidateQueries({ queryKey: ["repo-latest", repoId, environment] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Commit failed");
+    },
+  });
+
+  const starMutation = useMutation({
+    mutationFn: () =>
+      fetcher("/api/social/star", {
+        method: "POST",
+        body: JSON.stringify({ repoId }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["repo", repoId] });
+      toast.success("Star state updated");
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Star failed"),
+  });
+
+  const forkMutation = useMutation({
+    mutationFn: () =>
+      fetcher("/api/social/fork", {
+        method: "POST",
+        body: JSON.stringify({ repoId }),
+      }),
+    onSuccess: () => toast.success("Fork created in your dashboard"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Fork failed"),
+  });
+
+  useShortcuts([
+    { key: "s", ctrl: true, onTrigger: () => commitMutation.mutate() },
+    { key: "d", ctrl: true, onTrigger: () => calculateLocalDiff() },
+  ]);
+
+  function calculateLocalDiff() {
+    const baseline = latestQuery.data?.env.decrypted ?? {};
+    const current = parseDotEnv(envSource);
+    setLocalDiff(diffString(baseline, current));
+  }
+
+  const repo = repoQuery.data?.repo;
+  const envKeys = useMemo(() => Object.keys(parseDotEnv(envSource)), [envSource]);
+
+  return (
+    <div className="space-y-5">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-2xl">{repo?.name ?? "Repository"}</CardTitle>
+              <CardDescription>{repo?.description ?? "No description provided."}</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => starMutation.mutate()}>
+                <StarIcon className="mr-2 h-4 w-4" />
+                Star
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => forkMutation.mutate()}>
+                <GitForkIcon className="mr-2 h-4 w-4" />
+                Fork
+              </Button>
+              <Button size="sm" onClick={() => commitMutation.mutate()}>
+                <SaveIcon className="mr-2 h-4 w-4" />
+                Commit
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>{repo?.isPublic ? "public" : "private"}</Badge>
+            <Badge variant="muted">{repo?._count.envs ?? 0} snapshots</Badge>
+            <Badge variant="muted">{repo?._count.stars ?? 0} stars</Badge>
+            <Badge variant="warning">Ctrl/Cmd + S to commit</Badge>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
+              value={environment}
+              onChange={(event) =>
+                setEnvironment(event.target.value as "development" | "staging" | "production")
+              }
+            >
+              <option value="development">development</option>
+              <option value="staging">staging</option>
+              <option value="production">production</option>
+            </select>
+            <Input value={commitMsg} onChange={(event) => setCommitMsg(event.target.value)} />
+            <Button variant="secondary" onClick={calculateLocalDiff}>
+              Local Diff
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                const ai = await fetcher<{ suggestions: string[]; commitSummary: string }>("/api/ai/suggestions", {
+                  method: "POST",
+                  body: JSON.stringify({ env: parseDotEnv(envSource) }),
+                });
+                setCommitMsg(ai.commitSummary);
+                toast.success(ai.suggestions.join("\n"));
+              }}
+            >
+              <SparklesIcon className="mr-2 h-4 w-4" />
+              AI Suggest
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <MonacoEnvEditor value={envSource} onChange={setEnvSource} />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>History</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {repo?.envs.map((entry) => (
+              <div key={entry.id} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3">
+                <p className="text-sm text-zinc-200">
+                  v{entry.version} - {entry.environment}
+                </p>
+                <p className="text-sm text-zinc-400">{entry.commitMsg}</p>
+                <p className="text-xs text-zinc-500">{entry.diffSummary ?? "No diff summary"}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Env Visualizer</CardTitle>
+            <CardDescription>Grouped by key suffix dependencies.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EnvGraph keys={envKeys} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {localDiff ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Local Diff Preview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <pre className="max-h-[320px] overflow-auto rounded-xl bg-zinc-950 p-3 text-xs text-zinc-300">
+              {localDiff}
+            </pre>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+}

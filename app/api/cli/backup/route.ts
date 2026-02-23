@@ -14,7 +14,8 @@ const backupSchema = z.object({
   isPublic: z.boolean().default(false),
   environment: z.enum(["development", "staging", "production"]).default("development"),
   commitMsg: z.string().default("CLI backup"),
-  env: z.record(z.string(), z.string()),
+  env: z.record(z.string(), z.string()).optional(),
+  encryptedBlob: z.string().optional(),
   clientEncrypted: z.boolean().default(false),
 });
 
@@ -59,8 +60,14 @@ export async function POST(request: NextRequest) {
 
   const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
   const jsonBlob = parsed.data.clientEncrypted
-    ? JSON.stringify(parsed.data.env)
-    : encryptJson(parsed.data.env, userSecret);
+    ? parsed.data.encryptedBlob
+    : parsed.data.env
+      ? encryptJson(parsed.data.env, userSecret)
+      : null;
+
+  if (!jsonBlob) {
+    return fail("Provide env values or encryptedBlob", 422);
+  }
 
   const env = await prisma.env.create({
     data: {

@@ -6,8 +6,11 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { z } from "zod";
 
-import { createApiToken } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+
+function createAuthApiToken() {
+  return `${crypto.randomUUID().replace(/-/g, "")}${crypto.randomUUID().replace(/-/g, "")}`;
+}
 
 declare module "next-auth" {
   interface Session {
@@ -19,20 +22,12 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    planTier?: PlanTier;
-    apiToken?: string | null;
-  }
-}
-
 const credentialSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-const providers = [
+const providers: Array<ReturnType<typeof Credentials> | ReturnType<typeof Google>> = [
   Credentials({
     name: "Email and Password",
     credentials: {
@@ -54,7 +49,7 @@ const providers = [
       if (!user.apiToken) {
         const refreshed = await prisma.user.update({
           where: { id: user.id },
-          data: { apiToken: createApiToken() },
+          data: { apiToken: createAuthApiToken() },
         });
         user.apiToken = refreshed.apiToken;
       }
@@ -89,28 +84,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
+      const mutableToken = token as {
+        id?: string;
+        planTier?: PlanTier;
+        apiToken?: string | null;
+        email?: string | null;
+      };
+
       if (user) {
-        token.id = user.id;
-        token.planTier = (user as { planTier?: PlanTier }).planTier ?? "FREE";
-        token.apiToken = (user as { apiToken?: string | null }).apiToken ?? null;
+        mutableToken.id = user.id;
+        mutableToken.planTier = (user as { planTier?: PlanTier }).planTier ?? "FREE";
+        mutableToken.apiToken = (user as { apiToken?: string | null }).apiToken ?? null;
       }
 
-      if (!token.id && token.email) {
-        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
+      if (!mutableToken.id && mutableToken.email) {
+        const dbUser = await prisma.user.findUnique({ where: { email: mutableToken.email } });
         if (dbUser) {
-          token.id = dbUser.id;
-          token.planTier = dbUser.planTier;
-          token.apiToken = dbUser.apiToken;
+          mutableToken.id = dbUser.id;
+          mutableToken.planTier = dbUser.planTier;
+          mutableToken.apiToken = dbUser.apiToken;
         }
       }
 
-      return token;
+      return mutableToken;
     },
     async session({ session, token }) {
+      const mutableToken = token as {
+        id?: string;
+        planTier?: PlanTier;
+        apiToken?: string | null;
+      };
       if (session.user) {
-        session.user.id = token.id ?? "";
-        session.user.planTier = token.planTier ?? "FREE";
-        session.user.apiToken = token.apiToken ?? null;
+        session.user.id = mutableToken.id ?? "";
+        session.user.planTier = mutableToken.planTier ?? "FREE";
+        session.user.apiToken = mutableToken.apiToken ?? null;
       }
       return session;
     },
@@ -122,7 +129,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!dbUser?.apiToken) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { apiToken: createApiToken() },
+          data: { apiToken: createAuthApiToken() },
         });
       }
     },

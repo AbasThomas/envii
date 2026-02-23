@@ -2,6 +2,7 @@
 
 import Editor from "@monaco-editor/react";
 import { useMemo } from "react";
+import type { editor } from "monaco-editor";
 
 type Props = {
   value: string;
@@ -10,7 +11,7 @@ type Props = {
 };
 
 export function MonacoEnvEditor({ value, onChange, height = "420px" }: Props) {
-  const options = useMemo(
+  const options = useMemo<editor.IStandaloneEditorConstructionOptions>(
     () => ({
       minimap: { enabled: false },
       fontSize: 14,

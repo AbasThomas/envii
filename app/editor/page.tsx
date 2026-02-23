@@ -1,0 +1,181 @@
+"use client";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ArrowDownIcon, ArrowUpIcon, MoveVerticalIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import toast from "react-hot-toast";
+
+import { MonacoEnvEditor } from "@/components/editor/monaco-env-editor";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useRealtimeRepo, sendRealtimeRepoEvent } from "@/hooks/use-realtime-repo";
+import { parseDotEnv, stringifyDotEnv } from "@/lib/env";
+import { fetcher } from "@/lib/fetcher";
+
+type RepoListResponse = {
+  repos: Array<{ id: string; name: string; slug: string }>;
+};
+
+export default function EditorPage() {
+  const reposQuery = useQuery({
+    queryKey: ["editor-repos"],
+    queryFn: () => fetcher<RepoListResponse>("/api/repos"),
+  });
+
+  const [repoId, setRepoId] = useState("");
+  const [environment, setEnvironment] = useState<"development" | "staging" | "production">(
+    "development",
+  );
+  const [commitMsg, setCommitMsg] = useState("Editor commit");
+  const [envSource, setEnvSource] = useState("NODE_ENV=development\n");
+  const [activity, setActivity] = useState<string[]>([]);
+  const envMap = useMemo(() => parseDotEnv(envSource), [envSource]);
+  const [orderedKeys, setOrderedKeys] = useState<string[]>([]);
+  const effectiveOrderedKeys = useMemo(() => {
+    const sourceKeys = Object.keys(envMap);
+    if (!orderedKeys.length) return sourceKeys;
+    const keep = orderedKeys.filter((key) => sourceKeys.includes(key));
+    const added = sourceKeys.filter((key) => !keep.includes(key));
+    return [...keep, ...added];
+  }, [orderedKeys, envMap]);
+
+  useRealtimeRepo({
+    repoId,
+    onMessage: (message) => {
+      setActivity((prev) => [`${new Date().toLocaleTimeString()} ${message.message}`, ...prev].slice(0, 8));
+    },
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!repoId) throw new Error("Select a repository first");
+      await fetcher("/api/envs", {
+        method: "POST",
+        body: JSON.stringify({
+          repoId,
+          environment,
+          commitMsg,
+          env: envMap,
+        }),
+      });
+
+      await sendRealtimeRepoEvent(repoId, {
+        type: "commit",
+        message: `New ${environment} commit: ${commitMsg}`,
+      });
+    },
+    onSuccess: () => toast.success("Saved and broadcasted"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Save failed"),
+  });
+
+  function moveKey(index: number, direction: -1 | 1) {
+    setOrderedKeys(() => {
+      const next = [...effectiveOrderedKeys];
+      const to = index + direction;
+      if (to < 0 || to >= next.length) return effectiveOrderedKeys;
+      [next[index], next[to]] = [next[to], next[index]];
+      return next;
+    });
+  }
+
+  const reorderedEnv = effectiveOrderedKeys.reduce<Record<string, string>>((acc, key) => {
+    acc[key] = envMap[key];
+    return acc;
+  }, {});
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Collaborative Env Editor</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-2 md:grid-cols-[1fr_220px_220px_auto]">
+          <select
+            className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
+            value={repoId}
+            onChange={(event) => setRepoId(event.target.value)}
+          >
+            <option value="">Select repo...</option>
+            {reposQuery.data?.repos.map((repo) => (
+              <option key={repo.id} value={repo.id}>
+                {repo.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
+            value={environment}
+            onChange={(event) =>
+              setEnvironment(event.target.value as "development" | "staging" | "production")
+            }
+          >
+            <option value="development">development</option>
+            <option value="staging">staging</option>
+            <option value="production">production</option>
+          </select>
+          <Input value={commitMsg} onChange={(event) => setCommitMsg(event.target.value)} />
+          <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+            {saveMutation.isPending ? "Saving..." : "Save + Broadcast"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <MonacoEnvEditor
+          value={stringifyDotEnv(reorderedEnv)}
+          onChange={(value) => setEnvSource(value)}
+          height="500px"
+        />
+
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MoveVerticalIcon className="h-4 w-4" />
+                Reorder keys
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {effectiveOrderedKeys.map((key, index) => (
+                  <li
+                    key={key}
+                    className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2"
+                  >
+                    <span className="text-sm text-zinc-200">{key}</span>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => moveKey(index, -1)}>
+                        <ArrowUpIcon className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => moveKey(index, 1)}>
+                        <ArrowDownIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Realtime activity</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-zinc-300">
+              {activity.length ? (
+                activity.map((line, idx) => (
+                  <p key={`${line}-${idx}`} className="rounded-md bg-zinc-900/60 p-2">
+                    {line}
+                  </p>
+                ))
+              ) : (
+                <p className="text-zinc-500">No events yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

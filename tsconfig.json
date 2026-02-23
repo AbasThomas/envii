@@ -18,6 +18,7 @@
         "name": "next"
       }
     ],
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["./*"]
     }
@@ -30,5 +31,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "cypress", "cypress.config.ts"]
 }

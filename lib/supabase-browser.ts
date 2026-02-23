@@ -7,7 +7,7 @@ export function getSupabaseBrowserClient() {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !anon) {
-    throw new Error("Supabase browser env vars are missing.");
+    return null;
   }
 
   return createClient(url, anon);

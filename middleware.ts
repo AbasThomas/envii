@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-import { auth } from "@/auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 const protectedPages = ["/dashboard", "/repo", "/editor", "/profile", "/settings", "/billing"];
@@ -30,8 +30,12 @@ const publicApiAllowlist = new Set([
   "/api/ai/suggestions",
 ]);
 
-export default auth((req) => {
+export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   if (pathname.startsWith("/api/")) {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
@@ -50,7 +54,7 @@ export default auth((req) => {
       return NextResponse.next();
     }
 
-    if (protectedApiPrefixes.some((prefix) => pathname.startsWith(prefix)) && !req.auth) {
+    if (protectedApiPrefixes.some((prefix) => pathname.startsWith(prefix)) && !token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -58,14 +62,14 @@ export default auth((req) => {
   }
 
   const isProtectedPage = protectedPages.some((page) => pathname.startsWith(page));
-  if (isProtectedPage && !req.auth) {
+  if (isProtectedPage && !token) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.json|sw.js).*)"],
