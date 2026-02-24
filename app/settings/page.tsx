@@ -1,5 +1,7 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CopyIcon, RotateCwIcon, ShieldIcon } from "lucide-react";
 import Script from "next/script";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -8,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { fetcher } from "@/lib/fetcher";
+import { isValidCliPin } from "@/lib/cli-pin";
 import { isValidRepoPin } from "@/lib/repo-pin";
 
 declare global {
@@ -19,11 +22,55 @@ declare global {
 }
 
 export default function SettingsPage() {
+  const queryClient = useQueryClient();
   const [repoId, setRepoId] = useState("");
   const [repoPin, setRepoPin] = useState("");
   const [slackWebhook, setSlackWebhook] = useState("");
   const [ciRepoId, setCiRepoId] = useState("");
   const [ciRepoPin, setCiRepoPin] = useState("");
+  const [customCliPin, setCustomCliPin] = useState("");
+  const [shownCliPin, setShownCliPin] = useState("");
+
+  const cliPinQuery = useQuery({
+    queryKey: ["cli-pin-status"],
+    queryFn: () =>
+      fetcher<{
+        state: {
+          hasCliPin: boolean;
+          onboardingCompleted: boolean;
+          cliPinUpdatedAt: string | null;
+          cliPinLastUsedAt: string | null;
+        };
+      }>("/api/auth/cli-pin"),
+  });
+
+  const saveCliPinMutation = useMutation({
+    mutationFn: async (pin?: string) =>
+      fetcher<{ pin: string }>("/api/auth/cli-pin", {
+        method: "POST",
+        body: JSON.stringify(pin ? { pin } : {}),
+      }),
+    onSuccess: (data) => {
+      setShownCliPin(data.pin);
+      setCustomCliPin("");
+      queryClient.invalidateQueries({ queryKey: ["cli-pin-status"] });
+      toast.success("CLI PIN updated");
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Could not update CLI PIN"),
+  });
+
+  const revokeCliPinMutation = useMutation({
+    mutationFn: async () =>
+      fetcher("/api/auth/cli-pin", {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      setShownCliPin("");
+      queryClient.invalidateQueries({ queryKey: ["cli-pin-status"] });
+      toast.success("CLI PIN revoked and CLI sessions rotated");
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Could not revoke CLI PIN"),
+  });
 
   async function sendSlackPing() {
     try {
@@ -107,6 +154,68 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4">
       <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
+
+      <Card className="glass border-[#D4A574]/20">
+        <CardHeader>
+          <CardTitle>Security</CardTitle>
+          <CardDescription>
+            Manage your 6-digit CLI PIN and revoke active CLI sessions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <ShieldIcon className="h-4 w-4 text-[#D4A574]" />
+            <span className="text-sm text-[#a8b3af]">
+              {cliPinQuery.data?.state.hasCliPin ? "CLI PIN is configured" : "CLI PIN is not configured"}
+            </span>
+          </div>
+          <div className="grid gap-2 md:grid-cols-[220px_auto_auto]">
+            <Input
+              value={customCliPin}
+              onChange={(event) => setCustomCliPin(event.target.value.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Optional custom PIN"
+            />
+            <Button
+              variant="outline"
+              onClick={() => saveCliPinMutation.mutate(isValidCliPin(customCliPin) ? customCliPin : undefined)}
+              disabled={saveCliPinMutation.isPending}
+            >
+              <RotateCwIcon className="mr-2 h-4 w-4" />
+              Generate / Reset PIN
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => revokeCliPinMutation.mutate()}
+              disabled={revokeCliPinMutation.isPending}
+            >
+              Revoke PIN + Sessions
+            </Button>
+          </div>
+          <div className="rounded-lg border border-[#D4A574]/20 bg-[#02120e]/70 p-3">
+            <p className="text-xs uppercase tracking-wide text-[#D4A574]">Latest generated PIN</p>
+            <p className="mt-2 font-mono text-3xl tracking-[0.4em] text-[#f5f5f0]">
+              {shownCliPin || "------"}
+            </p>
+            <div className="mt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!shownCliPin}
+                onClick={() => {
+                  if (!shownCliPin) return;
+                  navigator.clipboard.writeText(shownCliPin);
+                  toast.success("CLI PIN copied");
+                }}
+              >
+                <CopyIcon className="mr-2 h-4 w-4" />
+                Copy PIN
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="glass border-[#D4A574]/20">
         <CardHeader>

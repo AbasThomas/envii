@@ -11,6 +11,7 @@ import inquirer from "inquirer";
 import { createApiClient } from "./api.js";
 import {
   getConfigPath,
+  readGlobalConfig,
   readProjectConfig,
   writeGlobalConfig,
   writeProjectConfig,
@@ -28,6 +29,8 @@ import { startEnvWatcher } from "./watcher.js";
 
 dotenv.config();
 
+const CLI_PIN_REGEX = /^\d{6}$/;
+
 const program = new Command();
 program
   .name("envii")
@@ -37,36 +40,58 @@ program
 program
   .command("login")
   .description("Authenticate and store your API token in ~/.envii/config.json")
-  .action(async () => {
+  .option("--pin", "Authenticate with your 6-digit CLI PIN")
+  .action(async (options: { pin?: boolean }) => {
+    const existingConfig = readGlobalConfig();
     const answers = await inquirer.prompt<{
       baseUrl: string;
       email: string;
       password: string;
+      pin: string;
     }>([
       {
         type: "input",
         name: "baseUrl",
         message: "API base URL",
-        default: process.env.ENVII_API_URL ?? "http://localhost:3000",
+        default: existingConfig.baseUrl ?? process.env.ENVII_API_URL ?? "http://localhost:3000",
       },
       {
         type: "input",
         name: "email",
         message: "Email",
+        default: existingConfig.email ?? "",
       },
-      {
-        type: "password",
-        name: "password",
-        message: "Password",
-      },
+      ...(options.pin
+        ? [
+            {
+              type: "password" as const,
+              name: "pin",
+              message: "Enter your 6-digit PIN",
+            },
+          ]
+        : [
+            {
+              type: "password" as const,
+              name: "password",
+              message: "Password",
+            },
+          ]),
     ]);
 
     const api = createApiClient();
     api.defaults.baseURL = answers.baseUrl;
-    const { data } = await api.post("/api/cli/login", {
-      email: answers.email,
-      password: answers.password,
-    });
+    const { data } = await api.post(
+      "/api/cli/login",
+      options.pin
+        ? {
+            email: answers.email,
+            pin: answers.pin,
+          }
+        : {
+            email: answers.email,
+            password: answers.password,
+          },
+    );
 
     writeGlobalConfig({
       baseUrl: answers.baseUrl,
@@ -75,29 +100,142 @@ program
       userId: data.user.id,
     });
 
-    console.log(chalk.green(`Logged in as ${data.user.email}`));
+    console.log(chalk.green(`Authenticated as ${data.user.name ?? data.user.email}`));
     console.log(chalk.gray(`Config stored at ${getConfigPath()}`));
+
+    if (!options.pin && !data.user.hasCliPin) {
+      console.log(
+        chalk.yellow(
+          "No CLI PIN set yet. Configure one now to use `envii login --pin` on your next login.",
+        ),
+      );
+      const pinSetup = await inquirer.prompt<{
+        setupPin: boolean;
+        pin: string;
+        confirmPin: string;
+      }>([
+        {
+          type: "confirm",
+          name: "setupPin",
+          message: "Set 6-digit CLI PIN now?",
+          default: true,
+        },
+        {
+          type: "password",
+          name: "pin",
+          message: "New 6-digit PIN",
+          when: (ctx) => ctx.setupPin,
+        },
+        {
+          type: "password",
+          name: "confirmPin",
+          message: "Confirm PIN",
+          when: (ctx) => ctx.setupPin,
+        },
+      ]);
+
+      if (pinSetup.setupPin) {
+        if (!CLI_PIN_REGEX.test(pinSetup.pin) || pinSetup.pin !== pinSetup.confirmPin) {
+          throw new Error("PIN must be exactly 6 digits and match confirmation.");
+        }
+
+        api.defaults.headers.common.Authorization = `Bearer ${data.token}`;
+        await api.post("/api/auth/cli-pin", {
+          pin: pinSetup.pin,
+        });
+        console.log(chalk.green("CLI PIN configured successfully."));
+      }
+    } else if (options.pin) {
+      console.log(chalk.gray("PIN login complete."));
+    } else {
+      console.log(chalk.gray("Tip: Next time, use `envii login --pin`."));
+    }
   });
 
 program
-  .command("init")
-  .description("Initialize current directory for envii")
+  .command("init [name]")
+  .description("Create or link a repository, then initialize current directory for envii")
   .option("-r, --repo <slug>", "Repo slug (defaults to folder name)")
   .option("-e, --environment <env>", "Target environment", "development")
-  .action(async (options) => {
-    const repoSlug = options.repo ?? basename(process.cwd()).toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+  .action(async (name, options) => {
+    const globalConfig = readGlobalConfig();
+    if (!globalConfig.token) {
+      throw new Error("Not logged in. Run `envii login` first.");
+    }
+
+    const inferredName = (name ?? options.repo ?? basename(process.cwd())).trim();
+    const fallbackSlug = inferredName.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
     const environment =
       options.environment === "staging" || options.environment === "production"
         ? options.environment
         : "development";
 
+    const initAnswers = await inquirer.prompt<{
+      visibility: "private" | "public";
+      description: string;
+      repoPin: string;
+      envFile: string;
+    }>([
+      {
+        type: "list",
+        name: "visibility",
+        message: "Project visibility",
+        choices: [
+          { name: "Private", value: "private" },
+          { name: "Public", value: "public" },
+        ],
+        default: "private",
+      },
+      {
+        type: "input",
+        name: "description",
+        message: "Description (optional)",
+      },
+      {
+        type: "password",
+        name: "repoPin",
+        message: "Repository 6-digit PIN",
+        validate: (value: string) => (CLI_PIN_REGEX.test(value) ? true : "PIN must be exactly 6 digits."),
+      },
+      {
+        type: "input",
+        name: "envFile",
+        message: "Env file path",
+        default: ".env",
+      },
+    ]);
+
+    const api = createApiClient();
+    api.defaults.baseURL = globalConfig.baseUrl;
+
+    let repoSlug = fallbackSlug;
+    let repoId: string | undefined;
+    try {
+      const { data } = await api.post("/api/repos", {
+        name: inferredName,
+        slug: options.repo ?? fallbackSlug,
+        visibility: initAnswers.visibility,
+        description: initAnswers.description?.trim() || undefined,
+        repoPin: initAnswers.repoPin,
+        tags: [],
+      });
+      repoSlug = data.repo.slug;
+      repoId = data.repo.id;
+      console.log(chalk.green(`Created repo "${repoSlug}" (ID: ${repoId})`));
+    } catch (error) {
+      const status = (error as { response?: { status?: number } }).response?.status;
+      if (status !== 409) throw error;
+      console.log(chalk.yellow(`Repo "${repoSlug}" already exists. Linking local project.`));
+    }
+
     writeProjectConfig({
       repoSlug,
       environment,
-      commitMessage: "Initial env snapshot",
+      envFile: initAnswers.envFile || ".env",
+      commitMessage: "Initial env setup",
     });
 
-    const envValues = readLocalEnv();
+    const envValues = readLocalEnv(initAnswers.envFile || ".env");
     if (!existsSync(".env.example")) {
       const sanitized = Object.keys(envValues).reduce<Record<string, string>>((acc, key) => {
         acc[key] = "";
@@ -108,6 +246,21 @@ program
     }
 
     console.log(chalk.green(`Initialized envii for repo "${repoSlug}" (${environment})`));
+    console.log(chalk.gray("Local config saved (.envii.json)"));
+  });
+
+program
+  .command("add [file]")
+  .description("Stage the env file used by backup/push commands")
+  .action((file = ".env") => {
+    const current = readProjectConfig();
+    if (!current) throw new Error("Run `envii init` first.");
+
+    writeProjectConfig({
+      ...current,
+      envFile: file,
+    });
+    console.log(chalk.green(`Staged ${file} for envii backup.`));
   });
 
 program
@@ -182,9 +335,11 @@ program
 program
   .command("watch")
   .description("Watch .env and prompt for backup on changes")
-  .option("-f, --file <file>", "Path to env file", ".env")
+  .option("-f, --file <file>", "Path to env file")
   .action(async (options) => {
-    startEnvWatcher(options.file);
+    const project = readProjectConfig();
+    const file = options.file ?? project?.envFile ?? ".env";
+    startEnvWatcher(file);
   });
 
 program.parseAsync(process.argv).catch((error: unknown) => {

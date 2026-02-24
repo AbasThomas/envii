@@ -35,6 +35,7 @@ export function writeGlobalConfig(config: EnviiConfig) {
 export type ProjectConfig = {
   repoSlug: string;
   environment: "development" | "staging" | "production";
+  envFile?: string;
   commitMessage?: string;
 };
 

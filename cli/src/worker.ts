@@ -24,8 +24,9 @@ function ensureProjectConfig() {
 export async function backupCommand(options?: { commitMessage?: string; key?: string }) {
   ensureToken();
   const project = ensureProjectConfig();
+  const envFile = project.envFile ?? ".env";
 
-  const envValues = readLocalEnv();
+  const envValues = readLocalEnv(envFile);
   const envFromProcess = Object.keys(envValues).length ? envValues : (process.env as Record<string, string>);
   const commitMessage = options?.commitMessage ?? project.commitMessage ?? "CLI backup";
 
@@ -61,6 +62,7 @@ export async function pullCommand(options?: { repoSlug?: string; key?: string })
   ensureToken();
   const project = ensureProjectConfig();
   const slug = options?.repoSlug ?? project.repoSlug;
+  const envFile = project.envFile ?? ".env";
 
   const api = createApiClient();
   const { data } = await api.get(`/api/cli/restore/${encodeURIComponent(slug)}?decrypt=true`, {
@@ -72,8 +74,8 @@ export async function pullCommand(options?: { repoSlug?: string; key?: string })
   });
 
   const values = data.env.values as Record<string, string>;
-  writeLocalEnv(values);
-  console.log(chalk.green(`Pulled latest env for ${slug} into .env`));
+  writeLocalEnv(values, envFile);
+  console.log(chalk.green(`Pulled latest env for ${slug} into ${envFile}`));
 }
 
 export async function listCommand() {

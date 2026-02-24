@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
           },
         },
       ],
-      ...(query ? where : {}),
+      ...(query || tag ? where : {}),
     },
     include: {
       owner: { select: { id: true, name: true, email: true, image: true } },

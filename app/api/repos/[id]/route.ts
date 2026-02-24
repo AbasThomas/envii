@@ -13,6 +13,7 @@ const updateSchema = z.object({
   description: z.string().max(1000).nullable().optional(),
   readme: z.string().max(100_000).nullable().optional(),
   repoPin: z.string().regex(/^\d{6}$/).optional(),
+  visibility: z.enum(["private", "public"]).optional(),
   tags: z.array(z.string().min(1).max(24)).optional(),
   defaultEnv: z.enum(["development", "staging", "production"]).optional(),
 });
@@ -93,7 +94,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       readme: parsed.data.readme,
       defaultEnv: parsed.data.defaultEnv,
       tags: parsed.data.tags?.map((t) => t.toLowerCase()),
-      isPublic: false,
+      ...(parsed.data.visibility
+        ? { isPublic: parsed.data.visibility === "public" }
+        : {}),
     },
   });
 

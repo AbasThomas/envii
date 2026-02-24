@@ -53,12 +53,12 @@ export default function ExplorePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">
             <TrendingUpIcon className="h-5 w-5 text-[#D4A574]" />
-            Private repositories only
+            Explore public repositories
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-[#a8b3af]">
-            envii is configured for private repos. Public explore is disabled.
+            Discover templates and workflows shared by the community.
           </p>
           <div className="relative">
             <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8d9a95]" />
@@ -87,7 +87,7 @@ export default function ExplorePage() {
       ) : (
         <Card>
           <CardContent className="py-8 text-sm text-[#a8b3af]">
-            No public repositories are available.
+            No repositories found for the current search.
           </CardContent>
         </Card>
       )}
