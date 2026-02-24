@@ -2,7 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { PlusIcon, RefreshCcwIcon } from "lucide-react";
+import { CompassIcon, PlusIcon, RefreshCcwIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -22,14 +23,27 @@ type RepoResponse = {
     description: string | null;
     tags: string[];
     isPublic: boolean;
-    _count: { stars: number; envs: number; forks: number };
+    updatedAt: string;
+    _count: { stars: number; envs: number; forks: number; shares: number };
   }>;
+};
+
+type ProfileResponse = {
+  profile: {
+    name: string | null;
+  };
 };
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
   const [repoName, setRepoName] = useState("");
   const [repoPin, setRepoPin] = useState("");
+
+  const profileQuery = useQuery({
+    queryKey: ["profile-summary"],
+    queryFn: () => fetcher<ProfileResponse>("/api/profile"),
+  });
+
   const reposQuery = useQuery({
     queryKey: ["repos"],
     queryFn: () => fetcher<RepoResponse>("/api/repos"),
@@ -58,6 +72,10 @@ export default function DashboardPage() {
   });
 
   const repos = reposQuery.data?.repos ?? [];
+  const totalCommits = repos.reduce((sum, repo) => sum + repo._count.envs, 0);
+  const totalStars = repos.reduce((sum, repo) => sum + repo._count.stars, 0);
+  const totalTeamMembers = repos.reduce((sum, repo) => sum + repo._count.shares, 0);
+  const displayName = profileQuery.data?.profile.name?.trim() || "there";
 
   function submitCreateRepo() {
     const trimmedName = repoName.trim();
@@ -84,7 +102,7 @@ export default function DashboardPage() {
       >
         <Card className="glass border-[#D4A574]/25">
           <CardHeader>
-            <CardTitle>Dashboard</CardTitle>
+            <CardTitle>{`Hey ${displayName}`}</CardTitle>
             <CardDescription>
               Manage private repos, encrypted backups, and approval-safe environment updates.
             </CardDescription>
@@ -93,6 +111,12 @@ export default function DashboardPage() {
             <Badge>Private repo only</Badge>
             <Badge variant="muted">CLI synced</Badge>
             <Badge variant="success">PIN guard active</Badge>
+            <Link href="/explore">
+              <Button size="sm" variant="ghost">
+                <CompassIcon className="mr-1 h-4 w-4" />
+                Explore Public Repos
+              </Button>
+            </Link>
           </CardContent>
         </Card>
         <Card className="border-[#D4A574]/25 bg-[#1B4D3E]/18">
@@ -132,6 +156,58 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </motion.section>
+
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardHeader>
+            <CardDescription>Your Repos</CardDescription>
+            <CardTitle>{repos.length}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Total Commits</CardDescription>
+            <CardTitle>{totalCommits}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Stars Received</CardDescription>
+            <CardTitle>{totalStars}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Team Members</CardDescription>
+            <CardTitle>{totalTeamMembers}</CardTitle>
+          </CardHeader>
+        </Card>
+      </section>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+          <CardDescription>Latest repository updates from your workspace.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {repos.slice(0, 6).map((repo) => (
+            <div
+              key={repo.id}
+              className="rounded-lg border border-[#D4A574]/12 bg-[#1B4D3E]/18 px-3 py-2 text-sm"
+            >
+              <p className="text-[#f5f5f0]">{repo.name}</p>
+              <p className="text-xs text-[#a8b3af]">
+                Updated {new Date(repo.updatedAt).toLocaleString()} - {repo._count.envs} snapshots
+              </p>
+            </div>
+          ))}
+          {!repos.length ? (
+            <p className="text-sm text-[#a8b3af]">
+              No activity yet. Create your first repo to get started.
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-[#f5f5f0]">Your Repositories</h2>

@@ -11,6 +11,7 @@ const registerSchema = z.object({
   password: z.string().min(8),
   name: z.string().min(2).max(64).optional(),
   referralCode: z.string().optional(),
+  termsAccepted: z.literal(true),
 });
 
 export async function POST(request: NextRequest) {

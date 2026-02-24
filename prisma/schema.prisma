@@ -41,6 +41,10 @@ model User {
   id                    String     @id @default(cuid())
   email                 String     @unique
   passwordHash          String?    @map("password_hash")
+  cliPinHash            String?    @map("cli_pin_hash")
+  cliPinUpdatedAt       DateTime?  @map("cli_pin_updated_at")
+  cliPinLastUsedAt      DateTime?  @map("cli_pin_last_used_at")
+  onboardingCompleted   Boolean    @default(false) @map("onboarding_completed")
   name                  String?
   image                 String?
   bio                   String?    @db.Text

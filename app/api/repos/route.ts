@@ -60,7 +60,11 @@ export async function GET(request: NextRequest) {
     },
     include: {
       owner: { select: { id: true, name: true, email: true, image: true } },
-      _count: { select: { stars: true, envs: true } },
+      stars: {
+        where: { userId: user.id },
+        select: { id: true },
+      },
+      _count: { select: { stars: true, envs: true, forks: true, shares: true } },
     },
     orderBy: { updatedAt: "desc" },
   });

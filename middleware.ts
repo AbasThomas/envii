@@ -3,7 +3,16 @@ import { getToken } from "next-auth/jwt";
 
 import { rateLimit } from "@/lib/rate-limit";
 
-const protectedPages = ["/dashboard", "/repo", "/editor", "/profile", "/settings", "/billing"];
+const protectedPages = [
+  "/dashboard",
+  "/onboarding",
+  "/repos",
+  "/repo",
+  "/editor",
+  "/profile",
+  "/settings",
+  "/billing",
+];
 
 const protectedApiPrefixes = [
   "/api/repos",

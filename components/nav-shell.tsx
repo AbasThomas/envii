@@ -1,7 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BellIcon, BoltIcon, CompassIcon, HomeIcon, SettingsIcon, UserIcon } from "lucide-react";
+import {
+  BellIcon,
+  BoltIcon,
+  CompassIcon,
+  FolderGit2Icon,
+  HomeIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
+  { href: "/repos", label: "Repos", icon: FolderGit2Icon },
   { href: "/explore", label: "Explore", icon: CompassIcon },
   { href: "/editor", label: "Editor", icon: BoltIcon },
   { href: "/profile", label: "Profile", icon: UserIcon },
