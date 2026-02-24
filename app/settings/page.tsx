@@ -152,7 +152,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="app-page">
       <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
 
       <Card className="glass border-[#D4A574]/20">

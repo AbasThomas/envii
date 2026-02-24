@@ -100,7 +100,7 @@ export default function EditorPage() {
   }, [repoId]);
 
   return (
-    <div className="space-y-4">
+    <div className="app-page">
       <Card>
         <CardHeader>
           <CardTitle>Collaborative Env Editor</CardTitle>

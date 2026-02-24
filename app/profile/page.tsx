@@ -61,7 +61,7 @@ export default function ProfilePage() {
   const profile = profileQuery.data?.profile;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="app-page lg:grid lg:grid-cols-[0.9fr_1.1fr]">
       <Card className="glass border-[#D4A574]/20">
         <CardHeader>
           <CardTitle>Creator Profile</CardTitle>

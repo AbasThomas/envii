@@ -6,7 +6,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       className={cn(
-        "rounded-2xl border border-[#D4A574]/20 bg-[#02120e]/70 p-4 shadow-[0_20px_50px_-35px_rgba(0,0,0,0.6)] backdrop-blur",
+        "rounded-2xl border border-[#D4A574]/20 bg-[#02120e]/70 p-5 shadow-[0_20px_50px_-35px_rgba(0,0,0,0.6)] backdrop-blur sm:p-6",
         className,
       )}
       {...props}
@@ -15,7 +15,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("mb-3 flex items-center justify-between", className)} {...props} />;
+  return <div className={cn("mb-4 space-y-1", className)} {...props} />;
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
@@ -27,5 +27,5 @@ export function CardDescription({ className, ...props }: React.HTMLAttributes<HT
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("space-y-3", className)} {...props} />;
+  return <div className={cn("space-y-4", className)} {...props} />;
 }

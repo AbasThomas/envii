@@ -23,11 +23,29 @@ declare module "next-auth" {
   }
 }
 
+const optionalPasswordSchema = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") return value;
+    const normalized = value.trim();
+    return normalized.length ? normalized : undefined;
+  },
+  z.string().min(8).optional(),
+);
+
+const optionalPinSchema = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") return value;
+    const normalized = value.trim();
+    return normalized.length ? normalized : undefined;
+  },
+  z.string().regex(/^\d{6}$/).optional(),
+);
+
 const credentialSchema = z
   .object({
     email: z.string().email(),
-    password: z.string().min(8).optional(),
-    pin: z.string().regex(/^\d{6}$/).optional(),
+    password: optionalPasswordSchema,
+    pin: optionalPinSchema,
   })
   .refine((value) => Boolean(value.password || value.pin), {
     message: "Password or PIN is required",

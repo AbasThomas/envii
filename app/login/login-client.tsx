@@ -102,12 +102,23 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
         }
       }
 
-      const result = await signIn("credentials", {
+      const credentialsPayload: {
+        email: string;
+        redirect: false;
+        password?: string;
+        pin?: string;
+      } = {
         email: values.email,
-        password: isSignup || loginMethod === "password" ? values.password : undefined,
-        pin: !isSignup && loginMethod === "pin" ? values.pin : undefined,
         redirect: false,
-      });
+      };
+      if (isSignup || loginMethod === "password") {
+        credentialsPayload.password = values.password;
+      }
+      if (!isSignup && loginMethod === "pin") {
+        credentialsPayload.pin = values.pin;
+      }
+
+      const result = await signIn("credentials", credentialsPayload);
 
       if (!result || result.error) {
         throw new Error(result?.error ?? "Could not sign in");

@@ -48,7 +48,7 @@ export default function ExplorePage() {
   }, [query, activeTag, searchQuery.data?.repos, trendingQuery.data?.repos]);
 
   return (
-    <div className="space-y-5">
+    <div className="app-page">
       <Card className="grid-bg border-[#D4A574]/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">

@@ -44,6 +44,18 @@ h6 {
   color: var(--foreground);
 }
 
+.app-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .app-page {
+    gap: 1.5rem;
+  }
+}
+
 .glass {
   background:
     linear-gradient(135deg, rgba(2, 18, 14, 0.82), rgba(27, 77, 62, 0.18)),
@@ -71,6 +83,14 @@ h6 {
   outline: none;
   box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.45);
   border-color: rgba(212, 165, 116, 0.45);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes scan {

@@ -26,7 +26,7 @@ export default function BillingPage() {
   });
 
   return (
-    <div className="space-y-5">
+    <div className="app-page">
       <Card className="grid-bg border-[#D4A574]/20">
         <CardHeader>
           <CardTitle className="text-2xl">Pricing and Billing</CardTitle>

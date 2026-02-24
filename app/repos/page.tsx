@@ -92,7 +92,7 @@ export default function ReposPage() {
   const canCreate = repoName.trim().length >= 2 && isValidRepoPin(repoPin);
 
   return (
-    <div className="space-y-5">
+    <div className="app-page">
       <Card className="glass border-[#D4A574]/25">
         <CardHeader>
           <CardTitle>Your Repositories</CardTitle>

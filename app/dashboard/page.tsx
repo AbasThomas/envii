@@ -107,7 +107,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="app-page">
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
