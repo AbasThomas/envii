@@ -13,6 +13,7 @@ const createRepoSchema = z.object({
   name: z.string().min(2).max(64),
   slug: z.string().min(2).max(64).optional(),
   repoPin: z.string().regex(/^\d{6}$/, "Repository PIN must be exactly 6 digits"),
+  visibility: z.enum(["private", "public"]).default("private"),
   description: z.string().max(1000).optional(),
   readme: z.string().max(100_000).optional(),
   tags: z.array(z.string().min(1).max(24)).default([]),
@@ -24,10 +25,6 @@ export async function GET(request: NextRequest) {
   const onlyPublic = searchParams.get("public") === "true";
   const query = searchParams.get("q")?.trim();
   const tag = searchParams.get("tag")?.trim();
-
-  if (onlyPublic) {
-    return ok({ repos: [] });
-  }
 
   const where: Prisma.RepoWhereInput = {
     ...(onlyPublic ? { isPublic: true } : {}),
@@ -42,6 +39,19 @@ export async function GET(request: NextRequest) {
       : {}),
     ...(tag ? { tags: { has: tag.toLowerCase() } } : {}),
   };
+
+  if (onlyPublic) {
+    const publicRepos = await prisma.repo.findMany({
+      where,
+      include: {
+        owner: { select: { id: true, name: true, email: true, image: true } },
+        _count: { select: { stars: true, envs: true, forks: true } },
+      },
+      orderBy: [{ starsCount: "desc" }, { updatedAt: "desc" }],
+      take: 50,
+    });
+    return ok({ repos: publicRepos });
+  }
 
   const { user, response } = await requireUser(request);
   if (response || !user) return response;
@@ -85,7 +95,8 @@ export async function POST(request: NextRequest) {
     return fail("Repository PIN must be 6 digits", 422);
   }
 
-  const limitCheck = await enforceRepoLimit(user.id, false);
+  const requestedPublicRepo = parsed.data.visibility === "public";
+  const limitCheck = await enforceRepoLimit(user.id, requestedPublicRepo);
   if (!limitCheck.allowed) {
     return fail(limitCheck.reason, 403);
   }
@@ -105,7 +116,7 @@ export async function POST(request: NextRequest) {
       slug,
       description: parsed.data.description,
       readme: parsed.data.readme,
-      isPublic: false,
+      isPublic: requestedPublicRepo,
       tags: parsed.data.tags.map((t) => t.toLowerCase()),
       defaultEnv: parsed.data.defaultEnv,
     },
