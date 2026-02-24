@@ -115,7 +115,7 @@ export default function OnboardingPage() {
               <Button
                 variant="ghost"
                 disabled={generateMutation.isPending}
-                onClick={() => generateMutation.mutate()}
+                onClick={() => generateMutation.mutate(undefined)}
               >
                 <RefreshCwIcon className="mr-2 h-4 w-4" />
                 Regenerate

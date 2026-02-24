@@ -46,9 +46,8 @@ export async function POST(request: NextRequest) {
   });
   if (!user) return fail("Invalid credentials", 401);
 
-  const isPinLogin = "pin" in parsed.data;
-
-  if (isPinLogin) {
+  if ("pin" in parsed.data) {
+    const pin = parsed.data.pin;
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
     const limit = rateLimit(`cli-pin-login:${email}:${ip}`, {
       max: 5,
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (!isValidCliPin(parsed.data.pin)) {
+    if (!isValidCliPin(pin)) {
       return fail("Invalid CLI PIN", 401);
     }
 
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pinValid = await compare(parsed.data.pin, pinState.cli_pin_hash);
+    const pinValid = await compare(pin, pinState.cli_pin_hash);
     if (!pinValid) return fail("Invalid CLI PIN", 401);
 
     await prisma.$executeRaw`
@@ -81,8 +80,9 @@ export async function POST(request: NextRequest) {
       WHERE "id" = ${user.id}
     `;
   } else {
+    const password = parsed.data.password;
     if (!user.passwordHash) return fail("Password login is not enabled for this account", 401);
-    const valid = await compare(parsed.data.password, user.passwordHash);
+    const valid = await compare(password, user.passwordHash);
     if (!valid) return fail("Invalid credentials", 401);
   }
 
