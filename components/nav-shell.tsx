@@ -3,6 +3,8 @@
 import {
   BellIcon,
   BoltIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   CreditCardIcon,
   CompassIcon,
   FolderGit2Icon,
@@ -11,8 +13,10 @@ import {
   ShieldCheckIcon,
   UserIcon,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";

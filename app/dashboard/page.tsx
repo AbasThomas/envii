@@ -25,6 +25,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { fetcher } from "@/lib/fetcher";
 import { isValidRepoPin } from "@/lib/repo-pin";
+import { cn } from "@/lib/utils";
 
 type RepoResponse = {
   repos: Array<{
