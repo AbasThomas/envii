@@ -21,10 +21,13 @@ export function NavShell() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-900 bg-zinc-950/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-emerald-900/30 bg-[#02120e]/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-cyan-400/90 text-zinc-950">
+          <span
+            className="grid h-8 w-8 place-items-center rounded-lg text-white text-base"
+            style={{ background: "linear-gradient(135deg, #c8854a, #a03020)" }}
+          >
             🌿
           </span>
           <div>
@@ -49,11 +52,11 @@ export function NavShell() {
                 {active ? (
                   <motion.span
                     layoutId="active-nav-pill"
-                    className="absolute inset-0 -z-10 rounded-lg bg-zinc-800"
+                    className="absolute inset-0 -z-10 rounded-lg bg-emerald-900/50"
                     transition={{ type: "spring", stiffness: 300, damping: 26 }}
                   />
                 ) : null}
-                <Icon className="h-4 w-4" />
+                <Icon className={cn("h-4 w-4", active ? "text-amber-400" : "")} />
                 {link.label}
               </Link>
             );
@@ -62,9 +65,9 @@ export function NavShell() {
 
         <div className="flex items-center gap-2">
           <Link href="/billing">
-            <Badge variant="success">₦800 Starter</Badge>
+            <Badge variant="warning">₦800 Starter</Badge>
           </Link>
-          <button className="rounded-full border border-zinc-800 p-2 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">
+          <button className="rounded-full border border-emerald-900/40 p-2 text-zinc-300 hover:bg-emerald-900/30 hover:text-zinc-100">
             <BellIcon className="h-4 w-4" />
             <span className="sr-only">Notifications</span>
           </button>

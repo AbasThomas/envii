@@ -5,6 +5,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { Providers } from "@/components/providers";
 import { PWARegister } from "@/components/pwa-register";
 import { SiteShell } from "@/components/site-shell";
+import { UnicornBackground } from "@/components/unicorn-background";
 import "./globals.css";
 
 const heading = Sora({
@@ -40,7 +41,8 @@ export default function RootLayout({
       <body className={`${heading.variable} ${body.variable} antialiased`}>
         <Providers>
           <PWARegister />
-          <div className="min-h-screen bg-app-background text-foreground">
+          <UnicornBackground />
+          <div className="relative z-10 min-h-screen text-foreground">
             <SiteShell>{children}</SiteShell>
           </div>
           <CommandPalette />

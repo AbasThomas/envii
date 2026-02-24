@@ -52,7 +52,7 @@ export default function ExplorePage() {
       <Card className="grid-bg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">
-            <TrendingUpIcon className="h-5 w-5 text-cyan-300" />
+            <TrendingUpIcon className="h-5 w-5 text-amber-400" />
             Private repositories only
           </CardTitle>
         </CardHeader>

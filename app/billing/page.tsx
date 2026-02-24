@@ -53,13 +53,13 @@ export default function BillingPage() {
             historyQuery.data.payments.map((payment) => (
               <div
                 key={payment.id}
-                className="flex flex-wrap items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2"
+                className="flex flex-wrap items-center justify-between rounded-lg border border-emerald-900/40 bg-emerald-950/20 px-3 py-2"
               >
                 <div className="text-sm">
-                  <p className="text-zinc-200">
+                  <p className="text-zinc-100">
                     {payment.planTier} • {payment.currency} {payment.amount}
                   </p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-zinc-400">
                     {payment.reference ?? "no-ref"} • {new Date(payment.createdAt).toLocaleString()}
                   </p>
                 </div>
@@ -69,7 +69,7 @@ export default function BillingPage() {
               </div>
             ))
           ) : (
-            <p className="text-sm text-zinc-500">No payments yet.</p>
+            <p className="text-sm text-zinc-400">No payments yet.</p>
           )}
         </CardContent>
       </Card>

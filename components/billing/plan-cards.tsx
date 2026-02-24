@@ -48,7 +48,7 @@ export function PlanCards() {
                 {plan.monthlyUsd > 0 ? `$${plan.monthlyUsd}/mo` : "Starter tier"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-zinc-300">
+            <CardContent className="space-y-3 text-sm text-zinc-200">
               <p>Repos: {plan.repoLimit === Number.MAX_SAFE_INTEGER ? "Unlimited" : plan.repoLimit}</p>
               <p>Public repos: {plan.allowPublicRepos ? "Yes" : "No"}</p>
               <p>Sharing: {plan.allowSharing ? "Yes" : "No"}</p>

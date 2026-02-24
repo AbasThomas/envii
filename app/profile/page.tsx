@@ -114,15 +114,15 @@ export default function ProfilePage() {
           <div className="space-y-2">
             {referralQuery.data?.referredUsers.length ? (
               referralQuery.data.referredUsers.map((user) => (
-                <div key={user.id} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-sm">
-                  <p className="text-zinc-200">{user.email}</p>
-                  <p className="text-zinc-500">
+                <div key={user.id} className="rounded-lg border border-emerald-900/40 bg-emerald-950/20 p-3 text-sm">
+                  <p className="text-zinc-100">{user.email}</p>
+                  <p className="text-zinc-400">
                     {user.planTier} • Joined {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-500">No referrals yet.</p>
+              <p className="text-sm text-zinc-400">No referrals yet.</p>
             )}
           </div>
         </CardContent>

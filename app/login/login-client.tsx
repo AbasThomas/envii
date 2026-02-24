@@ -72,7 +72,7 @@ export function LoginClient({ nextPath }: { nextPath: string }) {
 
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-4 md:grid-cols-[1.1fr_0.9fr]">
-      <Card className="glass border-zinc-800">
+      <Card className="glass border-emerald-800/40">
         <CardHeader>
           <CardTitle className="text-3xl">envii account</CardTitle>
           <CardDescription>
@@ -110,20 +110,20 @@ export function LoginClient({ nextPath }: { nextPath: string }) {
         </CardContent>
       </Card>
 
-      <Card className="grid-bg border-cyan-500/20">
+      <Card className="grid-bg border-amber-500/20">
         <CardHeader>
           <CardTitle className="text-xl">Keyboard shortcuts</CardTitle>
           <CardDescription>Power features from day one</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-zinc-300">
           <p>
-            <kbd className="rounded bg-zinc-800 px-2 py-1 text-xs">Ctrl/Cmd + K</kbd> command palette
+            <kbd className="rounded bg-emerald-900/60 px-2 py-1 text-xs text-amber-200">Ctrl/Cmd + K</kbd> command palette
           </p>
           <p>
-            <kbd className="rounded bg-zinc-800 px-2 py-1 text-xs">Ctrl/Cmd + S</kbd> save env snapshot
+            <kbd className="rounded bg-emerald-900/60 px-2 py-1 text-xs text-amber-200">Ctrl/Cmd + S</kbd> save env snapshot
           </p>
           <p>
-            <kbd className="rounded bg-zinc-800 px-2 py-1 text-xs">Esc</kbd> close overlays
+            <kbd className="rounded bg-emerald-900/60 px-2 py-1 text-xs text-amber-200">Esc</kbd> close overlays
           </p>
           <p className="pt-3 text-zinc-400">
             Free tier: 1 public repo • Basic: 5 private repos • Pro/Team: unlimited + social features.

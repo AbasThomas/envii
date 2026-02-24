@@ -32,7 +32,7 @@ export function RepoList({ repos }: { repos: RepoItem[] }) {
           transition={{ delay: index * 0.04 }}
         >
           <Link href={`/repo/${repo.id}`}>
-            <Card className="h-full transition hover:border-cyan-500/40">
+            <Card className="h-full transition hover:border-amber-500/40">
               <CardHeader>
                 <div className="flex items-center justify-between gap-3">
                   <CardTitle>{repo.name}</CardTitle>
