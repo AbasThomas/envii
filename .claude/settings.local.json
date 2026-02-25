@@ -5,7 +5,8 @@
       "Bash(python3:*)",
       "Bash(tail:*)",
       "Bash(powershell:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(cd /c/Users/USER/Desktop/envii/cli && npm run build 2>&1)"
     ]
   }
 }

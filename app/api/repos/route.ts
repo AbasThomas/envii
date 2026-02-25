@@ -6,6 +6,7 @@ import { z } from "zod";
 import { enforceRepoLimit, requireUser } from "@/lib/api-guards";
 import { fail, ok } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 import { isValidRepoPin } from "@/lib/repo-pin";
 import { slugify } from "@/lib/utils";
 
@@ -20,7 +21,7 @@ const createRepoSchema = z.object({
   defaultEnv: z.enum(["development", "staging", "production"]).default("development"),
 });
 
-export async function GET(request: NextRequest) {
+export const GET = withDb(async (request: NextRequest) => {
   const { searchParams } = request.nextUrl;
   const onlyPublic = searchParams.get("public") === "true";
   const query = searchParams.get("q")?.trim();
@@ -79,9 +80,9 @@ export async function GET(request: NextRequest) {
     orderBy: { updatedAt: "desc" },
   });
   return ok({ repos });
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withDb(async (request: NextRequest) => {
   const { user, response } = await requireUser(request);
   if (response || !user) return response;
 
@@ -141,4 +142,4 @@ export async function POST(request: NextRequest) {
   });
 
   return ok({ repo }, 201);
-}
+});

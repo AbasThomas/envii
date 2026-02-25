@@ -4,6 +4,7 @@ import { z } from "zod";
 import { encryptJson } from "@/lib/crypto";
 import { fail, ok } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 import { getRequestUser } from "@/lib/server-auth";
 import { slugify } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ const backupSchema = z.object({
   clientEncrypted: z.boolean().default(false),
 });
 
-export async function POST(request: NextRequest) {
+export const POST = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -82,4 +83,4 @@ export async function POST(request: NextRequest) {
       environment: env.environment,
     },
   });
-}
+});

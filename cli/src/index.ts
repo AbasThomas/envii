@@ -80,18 +80,28 @@ program
 
     const api = createApiClient();
     api.defaults.baseURL = answers.baseUrl;
-    const { data } = await api.post(
-      "/api/cli/login",
-      options.pin
-        ? {
-            email: answers.email,
-            pin: answers.pin,
-          }
-        : {
-            email: answers.email,
-            password: answers.password,
-          },
-    );
+
+    let data: { token: string; user: { id: string; email: string; name?: string; planTier: string; hasCliPin: boolean; onboardingCompleted: boolean } };
+    try {
+      const res = await api.post(
+        "/api/cli/login",
+        options.pin
+          ? { email: answers.email, pin: answers.pin }
+          : { email: answers.email, password: answers.password },
+      );
+      data = res.data;
+    } catch (err: unknown) {
+      const e = err as { response?: { status?: number; data?: { error?: string } }; code?: string };
+      if (e.code === "ECONNREFUSED" || e.code === "ECONNABORTED") {
+        throw new Error(`Cannot reach server at ${answers.baseUrl}. Is it running?`);
+      }
+      const status = e.response?.status;
+      const msg = e.response?.data?.error;
+      if (status === 503) throw new Error(`Server unavailable: ${msg ?? "database unreachable"}`);
+      if (status === 401) throw new Error(msg ?? "Invalid email or password");
+      if (status === 429) throw new Error(msg ?? "Too many attempts. Try again later.");
+      throw new Error(msg ?? `Login failed (HTTP ${status ?? "unknown"})`);
+    }
 
     writeGlobalConfig({
       baseUrl: answers.baseUrl,

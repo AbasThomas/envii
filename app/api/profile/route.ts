@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { fail, ok } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 import { getRequestUser } from "@/lib/server-auth";
 
 const profileSchema = z.object({
@@ -11,7 +12,7 @@ const profileSchema = z.object({
   image: z.string().url().optional(),
 });
 
-export async function GET(request: NextRequest) {
+export const GET = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -34,9 +35,9 @@ export async function GET(request: NextRequest) {
     },
     stats: { repos, stars, followers, following },
   });
-}
+});
 
-export async function PATCH(request: NextRequest) {
+export const PATCH = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -58,4 +59,4 @@ export async function PATCH(request: NextRequest) {
       image: updated.image,
     },
   });
-}
+});

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createApiToken } from "@/lib/crypto";
 import { fail, ok } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -14,7 +15,7 @@ const registerSchema = z.object({
   termsAccepted: z.literal(true),
 });
 
-export async function POST(request: NextRequest) {
+export const POST = withDb(async (request: NextRequest) => {
   const json = await request.json().catch(() => null);
   const parsed = registerSchema.safeParse(json);
 
@@ -54,4 +55,4 @@ export async function POST(request: NextRequest) {
   });
 
   return ok({ user }, 201);
-}
+});

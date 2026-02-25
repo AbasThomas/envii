@@ -6,6 +6,7 @@ import { createApiToken } from "@/lib/crypto";
 import { fail, ok } from "@/lib/http";
 import { isValidCliPin, generateCliPin } from "@/lib/cli-pin";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 import { getRequestUser } from "@/lib/server-auth";
 
 const upsertSchema = z.object({
@@ -41,7 +42,7 @@ async function readCliPinState(userId: string) {
   };
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -49,9 +50,9 @@ export async function GET(request: NextRequest) {
   if (!state) return fail("User not found", 404);
 
   return ok({ state });
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -80,9 +81,9 @@ export async function POST(request: NextRequest) {
     generated: !parsed.data.pin,
     state,
   });
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -103,4 +104,4 @@ export async function DELETE(request: NextRequest) {
     rotatedApiToken: true,
     state,
   });
-}
+});

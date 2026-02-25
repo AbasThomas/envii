@@ -2,9 +2,10 @@ import { NextRequest } from "next/server";
 
 import { fail, ok } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import { withDb } from "@/lib/prisma-resilience";
 import { getRequestUser } from "@/lib/server-auth";
 
-export async function GET(request: NextRequest) {
+export const GET = withDb(async (request: NextRequest) => {
   const user = await getRequestUser(request);
   if (!user) return fail("Unauthorized", 401);
 
@@ -19,4 +20,4 @@ export async function GET(request: NextRequest) {
   });
 
   return ok({ repos });
-}
+});

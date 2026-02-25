@@ -1,4 +1,7 @@
+import type { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+
+import { fail } from "@/lib/http";
 
 const CONNECTIVITY_ERROR_CODES = new Set(["P1000", "P1001", "P1002", "P1008", "P1017"]);
 const RETRY_BACKOFF_MS = 15_000;
@@ -43,6 +46,22 @@ function logConnectivityFailure(context: string, error: unknown) {
   lastLogAt = now;
   const summary = summarizeError(error).replace(/\s+/g, " ").trim();
   console.error(`[prisma] ${context}: ${summary}`);
+}
+
+type RouteHandler = (req: NextRequest, ctx?: unknown) => Promise<NextResponse>;
+
+export function withDb(handler: RouteHandler): RouteHandler {
+  return async (req, ctx) => {
+    try {
+      return await handler(req, ctx);
+    } catch (error) {
+      if (isPrismaConnectivityError(error)) {
+        return fail("Service temporarily unavailable — database unreachable", 503) as NextResponse;
+      }
+      console.error(`[api] unhandled error ${req.method} ${req.nextUrl.pathname}`, error);
+      return fail("Internal server error", 500) as NextResponse;
+    }
+  };
 }
 
 export async function withPrismaResilience<T>(context: string, operation: () => Promise<T>, fallback: T): Promise<T> {
