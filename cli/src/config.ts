@@ -9,10 +9,10 @@ export type EnviiConfig = {
   userId?: string;
 };
 
-const ENVII_DIR = join(homedir(), ".envii");
+const ENVII_DIR = join(homedir(), ".envvy");
 const CONFIG_FILE = join(ENVII_DIR, "config.json");
-const PROJECT_FILE = join(process.cwd(), ".envii.json");
-const PROD_API_URL = "https://envii.pxxl.pro";
+const PROJECT_FILE = join(process.cwd(), ".envvy.json");
+const PROD_API_URL = "https://envvy.pxxl.pro";
 const DEFAULT_API_URL =
   process.env.ENVII_API_URL ??
   (process.env.NODE_ENV === "development" ? "http://localhost:3000" : PROD_API_URL);

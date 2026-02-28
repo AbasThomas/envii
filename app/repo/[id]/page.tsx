@@ -131,7 +131,7 @@ export default function RepoPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"VIEWER" | "CONTRIB" | "EDITOR">("VIEWER");
 
-  const repoHeaders = repoPin ? { "x-envii-repo-pin": repoPin } : undefined;
+  const repoHeaders = repoPin ? { "x-envvy-repo-pin": repoPin } : undefined;
 
   useEffect(() => {
     if (!repoIdentifier) return;
@@ -642,7 +642,7 @@ export default function RepoPage() {
                       No snapshot found for <span className="text-[#D4A574]">{environment}</span>
                     </p>
                     <p className="text-xs leading-relaxed text-[#a8b3af]">
-                      Run <code className="rounded bg-[#02120e]/70 px-1.5 py-0.5 font-mono text-[#D4A574]">envii backup</code> in your project folder or commit from this editor to load environment values.
+                      Run <code className="rounded bg-[#02120e]/70 px-1.5 py-0.5 font-mono text-[#D4A574]">envvy backup</code> in your project folder or commit from this editor to load environment values.
                     </p>
                   </div>
                 </CardContent>

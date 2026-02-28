@@ -15,7 +15,7 @@
 
 ```bash
 git clone <repo-url>
-cd envii
+cd envvy
 npm install
 ```
 
@@ -45,7 +45,7 @@ AUTH_SECRET="your-secret-at-least-32-characters-long"
 NEXTAUTH_SECRET="your-secret-at-least-32-characters-long"
 
 # Full public URL of your app (no trailing slash)
-# Production: https://envii.pxxl.pro
+# Production: https://envvy.pxxl.pro
 AUTH_URL="http://localhost:3000"
 NEXTAUTH_URL="http://localhost:3000"
 AUTH_TRUST_HOST="true"
@@ -96,7 +96,7 @@ GROQ_MODEL="llama-3.3-70b-versatile"
 
 ```env
 SENTRY_ORG="your-sentry-org"
-SENTRY_PROJECT="envii"
+SENTRY_PROJECT="envvy"
 ```
 
 ---
@@ -146,12 +146,12 @@ npm run build
 npm run start
 ```
 
-If you are deploying to `https://envii.pxxl.pro`, set these in production:
+If you are deploying to `https://envvy.pxxl.pro`, set these in production:
 
 ```env
-AUTH_URL="https://envii.pxxl.pro"
-NEXTAUTH_URL="https://envii.pxxl.pro"
-ENVII_API_URL="https://envii.pxxl.pro"
+AUTH_URL="https://envvy.pxxl.pro"
+NEXTAUTH_URL="https://envvy.pxxl.pro"
+ENVII_API_URL="https://envvy.pxxl.pro"
 AUTH_TRUST_HOST="true"
 ```
 

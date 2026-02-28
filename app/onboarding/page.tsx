@@ -33,11 +33,11 @@ type CreateCliPinResponse = {
 };
 
 const CLI_COMMANDS = [
-  { cmd: "npm install -g envii", desc: "Install the CLI globally" },
-  { cmd: "envii login --pin", desc: "Authenticate with your PIN" },
-  { cmd: "envii init my-project", desc: "Initialize a new repository" },
-  { cmd: "envii add .env", desc: "Stage your environment file" },
-  { cmd: "envii push", desc: "Securely backup your secrets" },
+  { cmd: "npm install -g envvy", desc: "Install the CLI globally" },
+  { cmd: "envvy login --pin", desc: "Authenticate with your PIN" },
+  { cmd: "envvy init my-project", desc: "Initialize a new repository" },
+  { cmd: "envvy add .env", desc: "Stage your environment file" },
+  { cmd: "envvy push", desc: "Securely backup your secrets" },
 ];
 
 export default function OnboardingPage() {
@@ -82,7 +82,7 @@ export default function OnboardingPage() {
           Configure your <span className="text-[#D4A574]">CLI Access</span>.
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-[#a8b3af]">
-          To use envii from your terminal, you need a secure 6-digit PIN. 
+          To use envvy from your terminal, you need a secure 6-digit PIN. 
           This acts as your master key for CLI authentication.
         </p>
       </div>
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#4d6d62]">
                 <TerminalSquareIcon className="h-3 w-3" />
-                envii-cli v1.2.0
+                envvy-cli v1.2.0
               </div>
             </div>
             <div className="p-6 font-mono text-xs leading-relaxed">
@@ -258,7 +258,7 @@ export default function OnboardingPage() {
           <div className="rounded-2xl border border-[#D4A574]/10 bg-[#02120e]/40 p-5 space-y-3">
             <p className="text-[10px] font-black uppercase tracking-widest text-[#a8b3af]">Workflow Tip</p>
             <p className="text-xs leading-relaxed text-[#4d6d62]">
-              Use <code className="text-[#D4A574]">envii watch</code> to automatically backup changes whenever you save your .env file.
+              Use <code className="text-[#D4A574]">envvy watch</code> to automatically backup changes whenever you save your .env file.
             </p>
           </div>
         </div>

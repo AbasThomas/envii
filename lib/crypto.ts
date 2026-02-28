@@ -12,7 +12,7 @@ function getKey(secret?: string) {
     secret ??
     process.env.ENCRYPTION_MASTER_KEY ??
     process.env.NEXTAUTH_SECRET ??
-    "envii-dev-master-key";
+    "envvy-dev-master-key";
 
   return createHash("sha256").update(source).digest();
 }

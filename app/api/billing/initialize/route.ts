@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return fail("Invalid payload", 422, parsed.error.flatten());
 
   const plan = PLAN_MATRIX[parsed.data.planTier];
-  const reference = `envii_${user.id}_${randomUUID()}`;
+  const reference = `envvy_${user.id}_${randomUUID()}`;
 
   const payment = await prisma.payment.create({
     data: {

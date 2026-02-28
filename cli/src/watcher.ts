@@ -18,7 +18,7 @@ export function startEnvWatcher(path = ".env") {
         {
           type: "confirm",
           name: "shouldBackup",
-          message: "Run `envii backup` now?",
+          message: "Run `envvy backup` now?",
           default: true,
         },
       ]);

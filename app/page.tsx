@@ -27,14 +27,14 @@ function updateAnchorLabel(anchor: HTMLAnchorElement, label: string) {
     return;
   }
 
-  const labelledSpan = anchor.querySelector<HTMLSpanElement>('[data-envii-auth-label="true"]');
+  const labelledSpan = anchor.querySelector<HTMLSpanElement>('[data-envvy-auth-label="true"]');
   if (labelledSpan) {
     labelledSpan.textContent = label;
     return;
   }
 
   const fallback = document.createElement("span");
-  fallback.setAttribute("data-envii-auth-label", "true");
+  fallback.setAttribute("data-envvy-auth-label", "true");
   fallback.textContent = label;
   anchor.prepend(fallback);
 }

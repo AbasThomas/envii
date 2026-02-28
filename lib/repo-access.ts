@@ -63,7 +63,7 @@ export async function canAccessRepoWithPin(
     };
   }
 
-  const pin = request.headers.get("x-envii-repo-pin")?.trim();
+  const pin = request.headers.get("x-envvy-repo-pin")?.trim();
   if (!isValidRepoPin(pin)) {
     return {
       ok: false as const,

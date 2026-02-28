@@ -1,4 +1,4 @@
-const CACHE_NAME = "envii-v1";
+const CACHE_NAME = "envvy-v1";
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {

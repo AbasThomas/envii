@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   if (parsed.data.clientEncrypted && parsed.data.encryptedBlob) {
     jsonBlob = parsed.data.encryptedBlob;
   } else if (parsed.data.env) {
-    const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+    const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
     jsonBlob = encryptJson(parsed.data.env, userSecret);
   } else {
     return fail("Either env or encryptedBlob is required", 422);
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   let diffSummary = "initial commit";
   if (latest && parsed.data.env) {
     try {
-      const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+      const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
       const previous = decryptJson(latest.jsonBlob, userSecret);
       const delta = envDiff(previous, parsed.data.env);
       diffSummary = `+${delta.added.length} ~${delta.changed.length} -${delta.removed.length}`;

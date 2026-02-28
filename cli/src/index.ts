@@ -30,20 +30,20 @@ import { startEnvWatcher } from "./watcher.js";
 dotenv.config();
 
 const CLI_PIN_REGEX = /^\d{6}$/;
-const PROD_API_URL = "https://envii.pxxl.pro";
+const PROD_API_URL = "https://envvy.pxxl.pro";
 const DEFAULT_API_URL =
   process.env.ENVII_API_URL ??
   (process.env.NODE_ENV === "development" ? "http://localhost:3000" : PROD_API_URL);
 
 const program = new Command();
 program
-  .name("envii")
+  .name("envvy")
   .description("GitHub-style environment variable management CLI")
   .version("0.1.0");
 
 program
   .command("login")
-  .description("Authenticate and store your API token in ~/.envii/config.json")
+  .description("Authenticate and store your API token in ~/.envvy/config.json")
   .option("--pin", "Authenticate with your 6-digit CLI PIN")
   .action(async (options: { pin?: boolean }) => {
     const existingConfig = readGlobalConfig();
@@ -129,7 +129,7 @@ program
     if (!options.pin && !data.user.hasCliPin) {
       console.log(
         chalk.yellow(
-          "No CLI PIN set yet. Configure one now to use `envii login --pin` on your next login.",
+          "No CLI PIN set yet. Configure one now to use `envvy login --pin` on your next login.",
         ),
       );
       const pinSetup = await inquirer.prompt<{
@@ -173,19 +173,19 @@ program
     } else if (options.pin) {
       console.log(chalk.gray("PIN login complete."));
     } else {
-      console.log(chalk.gray("Tip: Next time, use `envii login --pin`."));
+      console.log(chalk.gray("Tip: Next time, use `envvy login --pin`."));
     }
   });
 
 program
   .command("init [name]")
-  .description("Create or link a repository, then initialize current directory for envii")
+  .description("Create or link a repository, then initialize current directory for envvy")
   .option("-r, --repo <slug>", "Repo slug (defaults to folder name)")
   .option("-e, --environment <env>", "Target environment", "development")
   .action(async (name, options) => {
     const globalConfig = readGlobalConfig();
     if (!globalConfig.token) {
-      throw new Error("Not logged in. Run `envii login` first.");
+      throw new Error("Not logged in. Run `envvy login` first.");
     }
 
     const inferredName = (name ?? options.repo ?? basename(process.cwd())).trim();
@@ -271,8 +271,8 @@ program
       console.log(chalk.green("Created .env.example"));
     }
 
-    console.log(chalk.green(`Initialized envii for repo "${repoSlug}" (${environment})`));
-    console.log(chalk.gray("Local config saved (.envii.json)"));
+    console.log(chalk.green(`Initialized envvy for repo "${repoSlug}" (${environment})`));
+    console.log(chalk.gray("Local config saved (.envvy.json)"));
   });
 
 program
@@ -280,18 +280,18 @@ program
   .description("Stage the env file used by backup/push commands")
   .action((file = ".env") => {
     const current = readProjectConfig();
-    if (!current) throw new Error("Run `envii init` first.");
+    if (!current) throw new Error("Run `envvy init` first.");
 
     writeProjectConfig({
       ...current,
       envFile: file,
     });
-    console.log(chalk.green(`Staged ${file} for envii backup.`));
+    console.log(chalk.green(`Staged ${file} for envvy backup.`));
   });
 
 program
   .command("backup")
-  .description("Backup your local env file to envii")
+  .description("Backup your local env file to envvy")
   .option("-m, --message <message>", "Commit message")
   .option("-k, --key <key>", "Client-side encryption key")
   .action(async (options) => {
@@ -309,7 +309,7 @@ program
     await restoreCommand(repoSlug, options.key);
   });
 
-program.command("list").description("List your envii repositories").action(listCommand);
+program.command("list").description("List your envvy repositories").action(listCommand);
 
 program
   .command("commit")
@@ -317,7 +317,7 @@ program
   .requiredOption("-m, --message <message>", "Commit message")
   .action((options) => {
     const current = readProjectConfig();
-    if (!current) throw new Error("Run `envii init` first.");
+    if (!current) throw new Error("Run `envvy init` first.");
 
     writeProjectConfig({
       ...current,
@@ -328,7 +328,7 @@ program
 
 program
   .command("push")
-  .description("Sync local .env to envii using the staged commit message")
+  .description("Sync local .env to envvy using the staged commit message")
   .option("-k, --key <key>", "Client-side encryption key")
   .action(async (options) => {
     await backupCommand({

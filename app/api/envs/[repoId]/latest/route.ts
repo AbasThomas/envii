@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 
   try {
-    const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+    const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
     const json = decryptJson(latest.jsonBlob, userSecret);
     return ok({
       env: {

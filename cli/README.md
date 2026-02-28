@@ -1,20 +1,20 @@
-# envii-cli
+# envvy-cli
 
-`envii-cli` is the official CLI for envii.
+`envvy-cli` is the official CLI for envvy.
 
 ## Commands
 
-- `envii login`
-- `envii init`
-- `envii backup`
-- `envii restore [repoSlug]`
-- `envii list`
-- `envii commit -m "message"`
-- `envii push`
-- `envii pull`
-- `envii fork <repoId>`
-- `envii star <repoId>`
-- `envii watch`
+- `envvy login`
+- `envvy init`
+- `envvy backup`
+- `envvy restore [repoSlug]`
+- `envvy list`
+- `envvy commit -m "message"`
+- `envvy push`
+- `envvy pull`
+- `envvy fork <repoId>`
+- `envvy star <repoId>`
+- `envvy watch`
 
 ## Local Development
 
@@ -22,5 +22,5 @@
 cd cli
 npm install
 npm run build
-node ./bin/envii.js --help
+node ./bin/envvy.js --help
 ```

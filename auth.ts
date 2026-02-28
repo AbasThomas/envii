@@ -10,7 +10,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withPrismaResilience } from "@/lib/prisma-resilience";
 
-const PROD_CANONICAL_URL = "https://envii.pxxl.pro";
+const PROD_CANONICAL_URL = "https://envvy.pxxl.pro";
 const LOCALHOST_URL_REGEX = /^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?(?:\/.*)?$/i;
 
 function normalizeAuthUrl(value?: string) {

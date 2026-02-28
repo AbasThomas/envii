@@ -5,7 +5,7 @@ export function isValidRepoPin(pin: string | null | undefined): pin is string {
 }
 
 export function repoPinStorageKey(repoId: string) {
-  return `envii.repo-pin.${repoId}`;
+  return `envvy.repo-pin.${repoId}`;
 }
 
 export function readStoredRepoPin(repoId: string): string | null {

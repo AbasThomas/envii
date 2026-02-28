@@ -1,11 +1,11 @@
 {
-  "name": "envii",
+  "name": "envvy",
   "version": "0.1.0",
-  "description": "CLI for envii environment variable backup platform",
+  "description": "CLI for envvy environment variable backup platform",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "envii": "bin/envii.js"
+    "envvy": "bin/envvy.js"
   },
   "files": [
     "bin",

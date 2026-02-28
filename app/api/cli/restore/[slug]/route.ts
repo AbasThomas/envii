@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 
   try {
-    const userKey = request.headers.get("x-envii-user-key") ?? undefined;
+    const userKey = request.headers.get("x-envvy-user-key") ?? undefined;
     const values = decryptJson(latest.jsonBlob, userKey);
     return ok({
       repo: { id: repo.id, slug: repo.slug, name: repo.name },

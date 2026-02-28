@@ -29,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const sections = [
-  { id: "what-is-envii", label: "What is envii?", icon: BookOpenIcon },
+  { id: "what-is-envvy", label: "What is envvy?", icon: BookOpenIcon },
   { id: "getting-started", label: "Getting Started", icon: RocketIcon },
   { id: "creating-a-repo", label: "Creating a Repo", icon: FolderGit2Icon },
   { id: "committing-env", label: "Committing Env Snapshots", icon: HistoryIcon },
@@ -134,7 +134,7 @@ function Step({
 }
 
 export default function DocsPage() {
-  const [activeId, setActiveId] = useState("what-is-envii");
+  const [activeId, setActiveId] = useState("what-is-envvy");
   const observer = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -226,8 +226,8 @@ export default function DocsPage() {
 
         {/* ── WHAT IS ENVII ── */}
         <section className="space-y-5">
-          <SectionHeading id="what-is-envii" icon={BookOpenIcon}>
-            What is envii?
+          <SectionHeading id="what-is-envvy" icon={BookOpenIcon}>
+            What is envvy?
           </SectionHeading>
           <p className="leading-relaxed text-[#a8b3af]">
             <strong className="text-[#f5f5f0]">Envii</strong> is the GitHub for{" "}
@@ -256,7 +256,7 @@ export default function DocsPage() {
               {
                 icon: TerminalIcon,
                 title: "CLI-first workflow",
-                desc: "envii backup, envii restore, envii login — use your terminal like you always have.",
+                desc: "envvy backup, envvy restore, envvy login — use your terminal like you always have.",
               },
               {
                 icon: ShareIcon,
@@ -313,7 +313,7 @@ export default function DocsPage() {
                 /onboarding
               </Link>{" "}
               where you generate your 6-digit CLI PIN. This PIN is used to authenticate the CLI
-              tool. Keep it safe — it is hashed and stored; envii cannot retrieve the raw value.
+              tool. Keep it safe — it is hashed and stored; envvy cannot retrieve the raw value.
             </Step>
             <Step number={4} title="You're in!">
               After onboarding, you land on the{" "}
@@ -367,7 +367,7 @@ export default function DocsPage() {
             Creating a Repository
           </SectionHeading>
           <p className="text-sm text-[#a8b3af] leading-relaxed">
-            A <strong className="text-[#f5f5f0]">repository</strong> in envii is a named container
+            A <strong className="text-[#f5f5f0]">repository</strong> in envvy is a named container
             for your environment snapshots — similar to a Git repo but for{" "}
             <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">.env</code> files. Each
             repo is protected by a 6-digit PIN and can hold multiple environments
@@ -469,26 +469,26 @@ NODE_ENV=development`}</CodeBlock>
             uploads it as a new snapshot.
           </p>
           <CodeBlock>{`# First-time login
-envii login
+envvy login
 
 # Login with your 6-digit PIN instead of password
-envii login --pin
+envvy login --pin
 
 # Point the CLI at your repo
-envii init my-app
+envvy init my-app
 
 # Add your .env file to tracking
-envii add .env
+envvy add .env
 
 # Commit a new snapshot
-envii commit -m "Add Redis connection string"
+envvy commit -m "Add Redis connection string"
 
-# Push to envii
-envii push`}</CodeBlock>
+# Push to envvy
+envvy push`}</CodeBlock>
           <Callout type="tip">
-            Run <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">envii push</code>{" "}
+            Run <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">envvy push</code>{" "}
             from within any project directory that has a{" "}
-            <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">.envii</code>{" "}
+            <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">.envvy</code>{" "}
             config file. The CLI uses your API token (generated at login) for authentication.
           </Callout>
         </section>
@@ -499,50 +499,50 @@ envii push`}</CodeBlock>
             CLI Reference
           </SectionHeading>
           <p className="text-lg text-[#a8b3af] leading-relaxed">
-            The envii CLI gives you a Git-like workflow for your environment files straight from
+            The envvy CLI gives you a Git-like workflow for your environment files straight from
             the terminal.
           </p>
 
           <div className="grid gap-4">
             {[
               {
-                cmd: "envii login",
+                cmd: "envvy login",
                 desc: "Authenticate with your email and password. Stores an API token locally.",
               },
               {
-                cmd: "envii login --pin",
+                cmd: "envvy login --pin",
                 desc: "Authenticate using your 6-digit CLI PIN instead of password.",
               },
               {
-                cmd: "envii init <repo-name>",
-                desc: "Initialise a new envii repository linked to the current directory.",
+                cmd: "envvy init <repo-name>",
+                desc: "Initialise a new envvy repository linked to the current directory.",
               },
               {
-                cmd: "envii add .env",
+                cmd: "envvy add .env",
                 desc: "Stage the .env file for the next commit.",
               },
               {
-                cmd: "envii commit -m \"message\"",
+                cmd: "envvy commit -m \"message\"",
                 desc: "Create a new encrypted snapshot with the given commit message.",
               },
               {
-                cmd: "envii push",
-                desc: "Upload the latest committed snapshot to envii.",
+                cmd: "envvy push",
+                desc: "Upload the latest committed snapshot to envvy.",
               },
               {
-                cmd: "envii restore",
+                cmd: "envvy restore",
                 desc: "Download and decrypt the latest snapshot for the current environment.",
               },
               {
-                cmd: "envii restore --version 5",
+                cmd: "envvy restore --version 5",
                 desc: "Restore a specific version by number.",
               },
               {
-                cmd: "envii repos",
-                desc: "List all your envii repositories.",
+                cmd: "envvy repos",
+                desc: "List all your envvy repositories.",
               },
               {
-                cmd: "envii status",
+                cmd: "envvy status",
                 desc: "Show the current repo, environment, and latest snapshot version.",
               },
             ].map((row) => (
@@ -557,7 +557,7 @@ envii push`}</CodeBlock>
 
           <Callout type="info">
             The CLI authenticates all requests with a Bearer token. The token is generated when you
-            run <code className="rounded-lg bg-[#1B4D3E]/40 px-2 py-0.5 text-[#D4A574]">envii login</code>{" "}
+            run <code className="rounded-lg bg-[#1B4D3E]/40 px-2 py-0.5 text-[#D4A574]">envvy login</code>{" "}
             and stored in your local config. You can revoke it from{" "}
             <Link href="/settings" className="text-[#D4A574] font-bold hover:underline">
               Settings → CLI PIN
@@ -617,7 +617,7 @@ envii push`}</CodeBlock>
             <Callout type="tip">
               Rollback via CLI:{" "}
               <code className="rounded-lg bg-[#1B4D3E]/40 px-2 py-0.5 text-[#D4A574] font-mono text-xs">
-                envii restore --version 4
+                envvy restore --version 4
               </code>
             </Callout>
           </div>
@@ -792,7 +792,7 @@ envii push`}</CodeBlock>
           </SectionHeading>
           <div className="space-y-8">
             <p className="text-lg leading-relaxed text-[#a8b3af]">
-              Fine-tune your envii experience. Manage your secure identity, billing, and third-party
+              Fine-tune your envvy experience. Manage your secure identity, billing, and third-party
               integrations from one central hub.
             </p>
 
@@ -848,7 +848,7 @@ envii push`}</CodeBlock>
           </SectionHeading>
           <p className="text-sm text-[#a8b3af] leading-relaxed">
             Your <strong className="text-[#f5f5f0]">CLI PIN</strong> is a 6-digit numeric PIN used
-            to authenticate the envii CLI tool without typing your full password. It can also be
+            to authenticate the envvy CLI tool without typing your full password. It can also be
             used to log into the web app in PIN mode.
           </p>
 
@@ -866,10 +866,10 @@ envii push`}</CodeBlock>
               .
             </Step>
             <Step number={2} title="Click Generate PIN">
-              envii generates a random 6-digit PIN. You can also type a custom 6-digit number.
+              envvy generates a random 6-digit PIN. You can also type a custom 6-digit number.
             </Step>
             <Step number={3} title="Copy and store it">
-              The PIN is shown only once. Store it in your password manager — once saved, envii
+              The PIN is shown only once. Store it in your password manager — once saved, envvy
               only stores the bcryptjs hash.
             </Step>
           </div>
@@ -885,7 +885,7 @@ envii push`}</CodeBlock>
           </p>
           <Callout type="warning">
             Revoking your PIN also rotates your API token. You will need to run{" "}
-            <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">envii login</code>{" "}
+            <code className="rounded bg-[#1B4D3E]/40 px-1 text-[#D4A574]">envvy login</code>{" "}
             again after revoking.
           </Callout>
         </section>
@@ -924,7 +924,7 @@ envii push`}</CodeBlock>
                 <Step number={1} title="Setup Slack Webhook">
                   Create an Incoming Webhook in your Slack App settings.
                 </Step>
-                <Step number={2} title="Configure envii">
+                <Step number={2} title="Configure envvy">
                   Paste the URL into <strong className="text-[#f5f5f0]">Settings → Integrations</strong>.
                 </Step>
                 <Step number={3} title="Go Live">
@@ -1043,7 +1043,7 @@ envii push`}</CodeBlock>
               <div className="space-y-4">
                 {[
                   "Authenticated sessions are required for all API endpoints.",
-                  "A valid repo PIN must be provided via the x-envii-repo-pin header.",
+                  "A valid repo PIN must be provided via the x-envvy-repo-pin header.",
                   "Role-based permissions restrict actions (VIEWER, CONTRIB, EDITOR, OWNER).",
                   "Immutable audit logs record every workspace action (TEAM plan).",
                 ].map((text, i) => (
@@ -1066,7 +1066,7 @@ envii push`}</CodeBlock>
           <div className="grid gap-4">
             {[
               {
-                q: "Can I use envii without the CLI?",
+                q: "Can I use envvy without the CLI?",
                 a: "Yes. The web editor lets you create, edit, and commit env snapshots entirely from the browser. The CLI is optional but recommended for daily developer workflows.",
               },
               {
@@ -1075,19 +1075,19 @@ envii push`}</CodeBlock>
               },
               {
                 q: "What happens if I forget my CLI PIN?",
-                a: "You can revoke the old PIN from Settings and generate a new one. Revoking also rotates your API token, so you will need to run envii login again.",
+                a: "You can revoke the old PIN from Settings and generate a new one. Revoking also rotates your API token, so you will need to run envvy login again.",
               },
               {
                 q: "Can I import an existing .env file?",
                 a: "Yes — paste the contents directly into the web editor (it supports standard .env format) or use the CLI to add and push your local .env file.",
               },
               {
-                q: "Are my .env files readable by the envii team?",
+                q: "Are my .env files readable by the envvy team?",
                 a: "No. All snapshots are encrypted with AES-256-GCM using a key that only your server knows. Even database administrators cannot read your plaintext values.",
               },
               {
                 q: "How do I switch between environments (dev, staging, prod)?",
-                a: "Each repo can hold separate histories for development, staging, and production. When committing via the web editor, select the environment from the dropdown. With the CLI, use envii commit --env staging.",
+                a: "Each repo can hold separate histories for development, staging, and production. When committing via the web editor, select the environment from the dropdown. With the CLI, use envvy commit --env staging.",
               },
               {
                 q: "Can collaborators see the repo PIN?",
@@ -1102,7 +1102,7 @@ envii push`}</CodeBlock>
                 a: "Yes, contact support or cancel via the Paystack subscription management link in Settings → Billing. Your plan reverts to FREE at the end of the billing cycle.",
               },
               {
-                q: "Does envii support team workspaces?",
+                q: "Does envvy support team workspaces?",
                 a: "The TEAM plan enables multi-user collaboration with audit logs. You can invite editors and viewers to individual repos. A full shared workspace feature is on the roadmap.",
               },
             ].map((item) => (

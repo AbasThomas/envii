@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const prompt = `You are envii AI assistant. Given this env JSON:\n${JSON.stringify(parsed.data.env, null, 2)}\nReturn JSON with keys "suggestions" (array of strings) and "commitSummary" (short sentence). Focus on secure defaults and missing keys.`;
+  const prompt = `You are envvy AI assistant. Given this env JSON:\n${JSON.stringify(parsed.data.env, null, 2)}\nReturn JSON with keys "suggestions" (array of strings) and "commitSummary" (short sentence). Focus on secure defaults and missing keys.`;
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",

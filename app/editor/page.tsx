@@ -73,7 +73,7 @@ export default function EditorPage() {
       await fetcher("/api/envs", {
         method: "POST",
         headers: {
-          "x-envii-repo-pin": repoPin,
+          "x-envvy-repo-pin": repoPin,
         },
         body: JSON.stringify({
           repoId,

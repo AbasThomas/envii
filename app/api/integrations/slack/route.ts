@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const text =
     parsed.data.message ??
-    `envii update: ${access.repo.name} now at ${latest?.environment ?? "unknown"} v${latest?.version ?? 0}`;
+    `envvy update: ${access.repo.name} now at ${latest?.environment ?? "unknown"} v${latest?.version ?? 0}`;
 
   await fetch(parsed.data.webhookUrl, {
     method: "POST",

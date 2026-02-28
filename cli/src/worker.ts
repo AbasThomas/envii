@@ -8,7 +8,7 @@ import { readLocalEnv, writeLocalEnv } from "./env.js";
 function ensureToken() {
   const config = readGlobalConfig();
   if (!config.token) {
-    throw new Error("Not logged in. Run `envii login` first.");
+    throw new Error("Not logged in. Run `envvy login` first.");
   }
   return config;
 }
@@ -16,7 +16,7 @@ function ensureToken() {
 function ensureProjectConfig() {
   const project = readProjectConfig();
   if (!project) {
-    throw new Error("Project not initialized. Run `envii init` first.");
+    throw new Error("Project not initialized. Run `envvy init` first.");
   }
   return project;
 }
@@ -68,7 +68,7 @@ export async function pullCommand(options?: { repoSlug?: string; key?: string })
   const { data } = await api.get(`/api/cli/restore/${encodeURIComponent(slug)}?decrypt=true`, {
     headers: options?.key
       ? {
-          "x-envii-user-key": options.key,
+          "x-envvy-user-key": options.key,
         }
       : undefined,
   });

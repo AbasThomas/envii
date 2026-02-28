@@ -1,6 +1,6 @@
-# envii
+# envvy
 
-**envii** is an open-source SaaS platform + CLI for securely backing up, versioning, and sharing environment variables across teams and projects.
+**envvy** is an open-source SaaS platform + CLI for securely backing up, versioning, and sharing environment variables across teams and projects.
 
 > **Live demo:** [hosted on pxl](https://envvy.pxxl.pro) &nbsp;·&nbsp; **Database:** Supabase (PostgreSQL)
 
@@ -29,7 +29,7 @@
 | AI | Groq API (llama-3.3-70b-versatile) |
 | Editor | Monaco Editor |
 | Styling | Tailwind CSS 4 + Radix UI |
-| CLI | Node.js npm package (`envii-cli`) |
+| CLI | Node.js npm package (`envvy-cli`) |
 | Testing | Jest + Cypress |
 | CI/CD | GitHub Actions |
 
@@ -54,7 +54,7 @@
 ## Project Structure
 
 ```
-envii/
+envvy/
 ├── app/                  # Next.js pages and API routes
 │   ├── api/              # 35+ API endpoints
 │   ├── dashboard/
@@ -69,7 +69,7 @@ envii/
 │   └── supabase.ts       # Supabase client
 ├── prisma/
 │   └── schema.prisma     # Database schema
-├── cli/                  # envii-cli npm package
+├── cli/                  # envvy-cli npm package
 ├── .github/workflows/    # CI and CLI publish pipelines
 └── .env.example          # All required environment variables
 ```
@@ -88,7 +88,7 @@ envii/
 
 ```bash
 git clone https://github.com/AbasThomas/envvy.git
-cd envii
+cd envvy
 npm install
 cd cli && npm install && cd ..
 ```
@@ -147,7 +147,7 @@ App runs at `http://localhost:3000`.
 3. Set the Paystack webhook URL in your Paystack dashboard:
 
 ```
-https://<your-domain>/api/webhooks/paystack
+https://envvy.pxxl.pro/api/webhooks/paystack
 ```
 
 4. Deploy:
@@ -163,19 +163,19 @@ vercel --prod
 The CLI is a standalone npm package in `./cli`.
 
 ```bash
-npm install -g envii-cli
+npm install -g envvy-cli
 
-envii login           # authenticate with your envii account
-envii init            # link current directory to a repo
-envii backup          # push current .env to envii
-envii restore         # pull the latest version
-envii list            # list all versions
-envii commit -m "msg" # backup with a commit message
-envii push            # push to a remote repo
-envii pull            # pull from a remote repo
-envii fork <slug>     # fork a public repo
-envii star <slug>     # star a public repo
-envii watch           # watch for .env changes and auto-backup
+envvy login           # authenticate with your envvy account
+envvy init            # link current directory to a repo
+envvy backup          # push current .env to envvy
+envvy restore         # pull the latest version
+envvy list            # list all versions
+envvy commit -m "msg" # backup with a commit message
+envvy push            # push to a remote repo
+envvy pull            # pull from a remote repo
+envvy fork <slug>     # fork a public repo
+envvy star <slug>     # star a public repo
+envvy watch           # watch for .env changes and auto-backup
 ```
 
 ### Publish CLI to npm
@@ -208,7 +208,7 @@ Please keep PRs focused — one feature or fix per PR.
 - Rate limiting is applied to all API routes (`middleware.ts`)
 - Security headers are set in `next.config.ts` and `vercel.json`
 
-To report a security vulnerability, please open a [GitHub issue](https://github.com/your-username/envii/issues) marked **[SECURITY]** or email directly.
+To report a security vulnerability, please open a [GitHub issue](https://github.com/AbasThomas/envvy/issues) marked **[SECURITY]** or email directly.
 
 ---
 

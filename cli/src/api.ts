@@ -28,7 +28,7 @@ export function createApiClient() {
         const isLoginEndpoint = String(error.config?.url ?? "").includes("/api/cli/login");
         const message = isLoginEndpoint
           ? detail
-          : `${detail}. Run \`envii login\` again to refresh your token.`;
+          : `${detail}. Run \`envvy login\` again to refresh your token.`;
         return Promise.reject(
           new Error(message),
         );

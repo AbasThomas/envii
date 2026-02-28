@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   if (!latest) return fail("No environment data found", 404);
 
   try {
-    const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+    const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
     const envMap = decryptJson(latest.jsonBlob, userSecret);
     const dotenv = stringifyDotEnv(envMap);
 

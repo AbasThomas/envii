@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   if (!from || !to) return fail("Version range not found", 404);
 
   try {
-    const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+    const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
     const fromEnv = decryptJson(from.jsonBlob, userSecret);
     const toEnv = decryptJson(to.jsonBlob, userSecret);
 

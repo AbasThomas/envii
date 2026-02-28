@@ -81,7 +81,7 @@ export default function SettingsPage() {
       await fetcher("/api/integrations/slack", {
         method: "POST",
         headers: {
-          "x-envii-repo-pin": repoPin,
+          "x-envvy-repo-pin": repoPin,
         },
         body: JSON.stringify({
           repoId,
@@ -136,7 +136,7 @@ export default function SettingsPage() {
       const data = await fetcher<{ dotenv: string; guide: string }>("/api/integrations/ci", {
         method: "POST",
         headers: {
-          "x-envii-repo-pin": ciRepoPin,
+          "x-envvy-repo-pin": ciRepoPin,
         },
         body: JSON.stringify({
           repoId: ciRepoId,
@@ -239,7 +239,7 @@ export default function SettingsPage() {
                 </p>
               </div>
               <p className="mt-4 text-center text-[10px] text-[#8d9a95]">
-                Use this PIN to authenticate your local terminal with <code className="text-[#D4A574]">envii login</code>
+                Use this PIN to authenticate your local terminal with <code className="text-[#D4A574]">envvy login</code>
               </p>
             </div>
           </CardContent>

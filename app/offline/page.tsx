@@ -4,7 +4,7 @@ export default function OfflinePage() {
       <p className="text-4xl">Offline</p>
       <h1 className="mt-2 text-2xl font-semibold text-[#f5f5f0]">Connection lost</h1>
       <p className="mt-2 text-sm text-[#a8b3af]">
-        envii will sync pending changes automatically once your connection is restored.
+        envvy will sync pending changes automatically once your connection is restored.
       </p>
     </div>
   );

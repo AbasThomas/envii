@@ -84,7 +84,7 @@
 | Feature | Description |
 |---------|-------------|
 | **Versioned .env files** | Every commit creates an immutable, encrypted snapshot |
-| **CLI-first** | `envii backup`, `envii restore`, `envii login` |
+| **CLI-first** | `envvy backup`, `envvy restore`, `envvy login` |
 | **Zero-knowledge encryption** | AES-256-GCM client or server-side |
 | **Role-based sharing** | VIEWER / CONTRIB / EDITOR roles with PIN protection |
 | **Fork & Star** | Discover and fork public env templates |

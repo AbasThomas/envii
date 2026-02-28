@@ -48,7 +48,7 @@ export const POST = withDb(async (request: NextRequest) => {
   });
   const nextVersion = (latest?.version ?? 0) + 1;
 
-  const userSecret = request.headers.get("x-envii-user-key") ?? undefined;
+  const userSecret = request.headers.get("x-envvy-user-key") ?? undefined;
   const jsonBlob = parsed.data.clientEncrypted
     ? parsed.data.encryptedBlob
     : parsed.data.env

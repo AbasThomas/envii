@@ -84,7 +84,7 @@ export default function ReposPage() {
       fetcher(`/api/repos/${payload.repoId}`, {
         method: "DELETE",
         headers: {
-          "x-envii-repo-pin": payload.pin,
+          "x-envvy-repo-pin": payload.pin,
         },
       }),
     onSuccess: () => {
