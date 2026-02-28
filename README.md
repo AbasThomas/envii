@@ -2,7 +2,7 @@
 
 **envii** is an open-source SaaS platform + CLI for securely backing up, versioning, and sharing environment variables across teams and projects.
 
-> **Live demo:** [hosted on pxl](https://envii.pxl.app) &nbsp;·&nbsp; **Database:** Supabase (PostgreSQL)
+> **Live demo:** [hosted on pxl](https://envvy.pxxl.pro) &nbsp;·&nbsp; **Database:** Supabase (PostgreSQL)
 
 ---
 
