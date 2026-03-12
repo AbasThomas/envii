@@ -36,10 +36,12 @@ const DEFAULT_API_URL =
   (process.env.NODE_ENV === "development" ? "http://localhost:3000" : PROD_API_URL);
 
 const program = new Command();
+const executableName = basename(process.argv[1] || "envvy").replace(/\.[cm]?js$/, "");
+
 program
-  .name("envvy")
+  .name(executableName)
   .description("GitHub-style environment variable management CLI")
-  .version("0.1.0");
+  .version("0.1.1");
 
 program
   .command("login")

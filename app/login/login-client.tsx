@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRightIcon, EyeIcon, EyeOffIcon, GithubIcon, KeyRoundIcon, MailIcon, RefreshCwIcon, ShieldCheckIcon } from "@/components/ui/icons";
+import { ArrowRightIcon, GithubIcon, KeyRoundIcon, MailIcon, RefreshCwIcon, ShieldCheckIcon } from "@/components/ui/icons";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -44,8 +44,6 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"password" | "pin">("password");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isSignup = mode === "signup";
 
@@ -105,17 +103,14 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
         }
       }
 
-      const callbackUrl = isSignup ? "/onboarding" : nextPath;
       const credentialsPayload: {
         email: string;
         redirect: false;
-        callbackUrl: string;
         password?: string;
         pin?: string;
       } = {
         email: values.email,
         redirect: false,
-        callbackUrl,
       };
       if (isSignup || loginMethod === "password") {
         credentialsPayload.password = values.password;
@@ -132,7 +127,7 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
 
       if (isSignup) {
         toast.success("Account created");
-        router.replace(result.url ?? "/onboarding");
+        router.push("/onboarding");
         router.refresh();
         return;
       }
@@ -151,7 +146,7 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
       }
 
       toast.success("Signed in");
-      router.replace(redirectPath);
+      router.push(redirectPath);
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Authentication failed");
@@ -174,7 +169,7 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
         <div className="flex flex-col justify-center space-y-8 pr-4">
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center">
-              <span className="text-3xl font-black tracking-tighter text-[#f5f5f0]">Envvy</span>
+              <span className="text-3xl font-black tracking-tighter text-[#f5f5f0]">Envii</span>
             </Link>
             <h1 className="text-5xl font-black tracking-tight text-[#f5f5f0] lg:text-6xl">
               {isSignup ? (
@@ -285,28 +280,18 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
                     )}
                   </div>
                   {isSignup || loginMethod === "password" ? (
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
-                        className="h-11 border-[#D4A574]/15 bg-[#02120e]/80 pr-11 focus:ring-[#D4A574]/30"
-                        {...form.register("password")}
-                      />
-                      <button
-                        type="button"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                        onClick={() => setShowPassword((value) => !value)}
-                        className="absolute inset-y-0 right-3 inline-flex items-center text-[#a8b3af] transition-colors hover:text-[#f5f5f0]"
-                      >
-                        {showPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                      </button>
-                    </div>
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="bg-[#02120e]/80 border-[#D4A574]/15 focus:ring-[#D4A574]/30 h-11"
+                      {...form.register("password")} 
+                    />
                   ) : (
                     <Input
                       inputMode="numeric"
                       maxLength={6}
                       placeholder="000000"
-                      className="h-11 border-[#D4A574]/15 bg-[#02120e]/80 text-center text-xl font-black tracking-[0.5em] focus:ring-[#D4A574]/30"
+                      className="bg-[#02120e]/80 border-[#D4A574]/15 focus:ring-[#D4A574]/30 h-11 text-center text-xl font-black tracking-[0.5em]"
                       {...form.register("pin")}
                       onChange={(event) => {
                         const value = event.target.value.replace(/\D/g, "").slice(0, 6);
@@ -320,22 +305,12 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
                   <>
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-[#D4A574]">Confirm Password</label>
-                      <div className="relative">
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm password"
-                          className="h-11 border-[#D4A574]/15 bg-[#02120e]/80 pr-11 focus:ring-[#D4A574]/30"
-                          {...form.register("confirmPassword")}
-                        />
-                        <button
-                          type="button"
-                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                          onClick={() => setShowConfirmPassword((value) => !value)}
-                          className="absolute inset-y-0 right-3 inline-flex items-center text-[#a8b3af] transition-colors hover:text-[#f5f5f0]"
-                        >
-                          {showConfirmPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                        </button>
-                      </div>
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        className="bg-[#02120e]/80 border-[#D4A574]/15 focus:ring-[#D4A574]/30 h-11"
+                        {...form.register("confirmPassword")} 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-[#D4A574]">Referral Code (Optional)</label>
@@ -379,7 +354,7 @@ export function LoginClient({ nextPath, mode, defaultReferralCode }: LoginClient
                 <span className="w-full border-t border-[#D4A574]/10" />
               </div>
               <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest">
-                <span className="bg-[#02120e] px-4 text-[#4d6d62]">New to Envvy?</span>
+                <span className="bg-[#02120e] px-4 text-[#4d6d62]">New to envii?</span>
               </div>
             </div>
 
